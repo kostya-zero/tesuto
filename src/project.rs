@@ -6,7 +6,8 @@ use serde_yaml;
 #[derive(Serialize, Deserialize)]
 pub struct Stage {
     pub name: String,
-    pub command: String,
+    pub program: String,
+    pub args: Vec<String>,
     pub expectFail: bool,
     pub showOnlyErrors: bool
 }
@@ -24,30 +25,36 @@ impl Default for Project {
         Project {
             name: "TesutoProject".to_string(), 
             requiredTools: Vec::new(), 
-            stages: Vec::new()
+            stages: vec![Stage {
+                name: "Test echo.".to_string(),
+                program: "echo".to_string(),
+                args: vec!["\"hello world\"".to_string()],
+                expectFail: false,
+                showOnlyErrors: false
+            }]
         }
     }
 }
 
 pub struct Manager;
 impl Manager {
-    fn check() -> bool {
+    pub fn check() -> bool {
         Path::new("tesuto.yml").exists() 
     }
 
-    fn generate() {
+    pub fn generate() {
         let project: Project = Project { ..Default::default() };
         let content: String = serde_yaml::to_string(&project).unwrap();
         fs::write("tesuto.yml", content).unwrap();
     }
 
-    fn read() -> Project {
+    pub fn read() -> Project {
         let content: String = fs::read_to_string("tesuto.yml").unwrap();
         let config: Project = serde_yaml::from_str(&content).unwrap();
         config
     }
 
-    fn write(project: Project) {
+    pub fn write(project: Project) {
         let content: String = serde_yaml::to_string(&project).unwrap();
         fs::write("tesuto.yml", content).unwrap();
     }
