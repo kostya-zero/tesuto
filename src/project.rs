@@ -1,6 +1,6 @@
-use std::{path::Path, fs};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use serde_yaml;
+use std::{fs, path::Path};
 
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize)]
@@ -9,29 +9,37 @@ pub struct Stage {
     pub program: String,
     pub args: Vec<String>,
     pub expectFail: bool,
-    pub showOnlyErrors: bool
+    pub showOnlyErrors: bool,
+}
+
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize)]
+pub struct Options {
+    pub name: String,
+    pub requiredTools: Vec<String>,
 }
 
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize)]
 pub struct Project {
-    pub name: String,
-    pub requiredTools: Vec<String>,
-    pub stages: Vec<Stage>
+    pub options: Options,
+    pub stages: Vec<Stage>,
 }
 
 impl Default for Project {
     fn default() -> Self {
         Project {
-            name: "TesutoProject".to_string(), 
-            requiredTools: Vec::new(), 
+            options: Options {
+                name: String::from("TesutoProject"),
+                requiredTools: vec![],
+            },
             stages: vec![Stage {
                 name: "Test echo.".to_string(),
                 program: "echo".to_string(),
                 args: vec!["\"hello world\"".to_string()],
                 expectFail: false,
-                showOnlyErrors: false
-            }]
+                showOnlyErrors: false,
+            }],
         }
     }
 }
@@ -39,11 +47,13 @@ impl Default for Project {
 pub struct Manager;
 impl Manager {
     pub fn check() -> bool {
-        Path::new("tesuto.yml").exists() 
+        Path::new("tesuto.yml").exists()
     }
 
     pub fn generate() {
-        let project: Project = Project { ..Default::default() };
+        let project: Project = Project {
+            ..Default::default()
+        };
         let content: String = serde_yaml::to_string(&project).unwrap();
         fs::write("tesuto.yml", content).unwrap();
     }
