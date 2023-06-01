@@ -1,12 +1,12 @@
-use std::process::exit;
-use clap::{Command, Arg};
+use clap::{Arg, Command};
 use project::{Manager, Project};
+use std::process::exit;
 
 use crate::{project::Stage, runner::Runner};
 
 mod project;
-mod term;
 mod runner;
+mod term;
 
 fn app() -> Command {
     Command::new("tesuto")
@@ -15,11 +15,8 @@ fn app() -> Command {
         .subcommand_required(true)
         .arg_required_else_help(true)
         .subcommands([
-            Command::new("gen")
-            .about("Generate default configuration."),
-
-            Command::new("run")
-            .about("Run current testing configuration.")
+            Command::new("gen").about("Generate default configuration."),
+            Command::new("run").about("Run current testing configuration."),
         ])
 }
 
@@ -31,11 +28,11 @@ fn main() {
                 println!("Confgiuration file already exists.");
                 exit(1);
             }
-            
+
             println!("Generating new confgiuration...");
             Manager::generate();
             println!("Done! They are saved as 'tesuto.yml'.");
-        },
+        }
         Some(("run", _sub)) => {
             if !Manager::check() {
                 println!("Confgiuration file not exists.");
@@ -44,12 +41,12 @@ fn main() {
 
             let project: Project = Manager::read();
 
-            println!("Running project '{}'.", project.name);
+            println!("Running project '{}'.", project.options.name);
             if project.stages.is_empty() {
                 println!("No stages are added to project.");
                 exit(1);
             }
-            
+
             for i in project.stages {
                 println!("Running stage: {}", i.name);
 
@@ -62,7 +59,7 @@ fn main() {
             }
 
             println!("All stages passed!");
-        },
-        _ => println!("Error")
+        }
+        _ => println!("Error"),
     }
 }
