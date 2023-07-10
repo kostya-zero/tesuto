@@ -3,19 +3,34 @@ use serde_yaml;
 use std::{fs, path::Path};
 
 #[allow(non_snake_case)]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Stage {
     pub name: String,
     pub program: String,
+    #[serde(default)]
     pub args: Vec<String>,
+    #[serde(default)]
     pub expectFail: bool,
+    #[serde(default)]
     pub showOnlyErrors: bool,
 }
 
+impl Default for Stage {
+    fn default() -> Self {
+        Self {  name: String::from("stage"),
+                program: String::from(""),
+                args: vec![],
+                expectFail: false,
+                showOnlyErrors: false,
+        }
+    }
+}
+
 #[allow(non_snake_case)]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Options {
     pub name: String,
+    #[serde(default)]
     pub requiredTools: Vec<String>,
 }
 
@@ -33,13 +48,7 @@ impl Default for Project {
                 name: String::from("TesutoProject"),
                 requiredTools: vec![],
             },
-            stages: vec![Stage {
-                name: "Test echo.".to_string(),
-                program: "echo".to_string(),
-                args: vec!["\"hello world\"".to_string()],
-                expectFail: false,
-                showOnlyErrors: false,
-            }],
+            stages: vec![Stage { ..Default::default() }],
         }
     }
 }

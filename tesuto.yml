@@ -1,0 +1,15 @@
+options:
+  name: TesutoProject
+  requiredTools: []
+stages:
+- name: stage
+  program: ''
+  args: []
+  expectFail: false
+  showOnlyErrors: false
+- name: Stage
+  program: echo
+  args:
+  - '"Hello world!"'
+  expectFail: false
+  showOnlyErrors: false

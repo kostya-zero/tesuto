@@ -1,11 +1,13 @@
-use crate::project::Stage;
+use crate::{project::Stage, term::Term};
 use std::process::{exit, Command, Stdio};
 
 pub struct Runner;
 impl Runner {
     pub fn run_stage(stage: Stage) {
         let mut command = Command::new(stage.program);
-        command.args(stage.args);
+        if !stage.args.is_empty() {
+            command.args(stage.args);
+        }
 
         if stage.showOnlyErrors {
             command
@@ -25,16 +27,16 @@ impl Runner {
 
         if stage.expectFail {
             if !result.status.success() {
-                println!("Stage passed.");
+                Term::success("Stage passed.");
             } else {
-                println!("Stage failed!");
+                Term::fatal("Stage failed!");
                 exit(1);
             }
         } else {
             if result.status.success() {
-                println!("Stage passed.");
+                Term::success("Stage passed.");
             } else {
-                println!("Stage failed!");
+                Term::fatal("Stage failed!");
                 exit(1);
             }
         }

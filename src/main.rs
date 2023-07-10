@@ -2,7 +2,7 @@ use clap::{Arg, Command};
 use project::{Manager, Project};
 use std::process::exit;
 
-use crate::{project::Stage, runner::Runner};
+use crate::{project::Stage, runner::Runner, term::Term};
 
 mod project;
 mod runner;
@@ -17,6 +17,7 @@ fn app() -> Command {
         .subcommands([
             Command::new("gen").about("Generate default configuration."),
             Command::new("run").about("Run current testing configuration."),
+            Command::new("add").about("Add new stage.")
         ])
 }
 
@@ -25,40 +26,77 @@ fn main() {
     match args.subcommand() {
         Some(("gen", _sub)) => {
             if Manager::check() {
-                println!("Confgiuration file already exists.");
+                Term::fatal("Confgiuration file already exists.");
                 exit(1);
             }
 
-            println!("Generating new confgiuration...");
+            Term::work("Generating new confgiuration...");
             Manager::generate();
-            println!("Done! They are saved as 'tesuto.yml'.");
+            Term::success("Done! They are saved as 'tesuto.yml'.");
         }
         Some(("run", _sub)) => {
             if !Manager::check() {
-                println!("Confgiuration file not exists.");
+                Term::fatal("Confgiuration file not exists.");
                 exit(1);
             }
 
             let project: Project = Manager::read();
 
-            println!("Running project '{}'.", project.options.name);
+            Term::info(&format!("Running project '{}'.", project.options.name));
             if project.stages.is_empty() {
-                println!("No stages are added to project.");
+                Term::warn("No stages are added to project.");
                 exit(1);
             }
 
+            println!("{:?}", project.stages.clone());
+
             for i in project.stages {
-                println!("Running stage: {}", i.name);
+                Term::work(&format!("Running stage: {}", i.name));
 
                 if i.program.is_empty() {
-                    println!("No command given. Skipping...");
-                    break;
+                    Term::warn("No command given. Skipping...");
+                    continue;
                 }
 
                 Runner::run_stage(i);
             }
 
-            println!("All stages passed!");
+            Term::success("All stages passed!");
+        }
+        Some(("add", _sub)) => {
+            if !Manager::check() {
+                Term::fatal("Confgiuration file not exists.");
+                exit(1);
+            }
+
+            let mut project: Project = Manager::read();
+            
+            let mut new_stage = Stage { ..Default::default() };
+            new_stage.name = Term::ask("Name for new stage.", "Stage");
+            if project.stages.clone().into_iter().any(|i| i.name == new_stage.name) {
+                Term::fatal("Stage with same name already exists.");
+                exit(1);
+            }
+
+            new_stage.program = Term::ask("Program to run.", "");
+            if new_stage.program.is_empty() {
+                Term::fatal("No program given.");
+                exit(1);
+            }
+
+            loop {
+                let arg = Term::ask("Argument for program (leave empty to end).", "");
+                if arg == "" {
+                    break;
+                }
+                new_stage.args.push(arg);
+            }
+
+            project.stages.push(new_stage);
+            Manager::write(project);
+            Term::success("Stage added!");
+            Term::hint("You can change additional options in 'tesuto.yml'.");
+            
         }
         _ => println!("Error"),
     }
