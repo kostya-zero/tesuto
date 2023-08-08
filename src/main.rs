@@ -48,6 +48,8 @@ fn main() {
                 exit(1);
             }
 
+
+
             println!("{:?}", project.stages.clone());
 
             for i in project.stages {

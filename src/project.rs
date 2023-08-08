@@ -17,11 +17,12 @@ pub struct Stage {
 
 impl Default for Stage {
     fn default() -> Self {
-        Self {  name: String::from("stage"),
-                program: String::from(""),
-                args: vec![],
-                expectFail: false,
-                showOnlyErrors: false,
+        Self {  
+            name: String::from("stage"),
+            program: String::from(""),
+            args: vec![],
+            expectFail: false,
+            showOnlyErrors: false,
         }
     }
 }
@@ -30,8 +31,6 @@ impl Default for Stage {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Options {
     pub name: String,
-    #[serde(default)]
-    pub requiredTools: Vec<String>,
 }
 
 #[allow(non_snake_case)]
@@ -46,7 +45,6 @@ impl Default for Project {
         Project {
             options: Options {
                 name: String::from("TesutoProject"),
-                requiredTools: vec![],
             },
             stages: vec![Stage { ..Default::default() }],
         }

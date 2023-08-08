@@ -9,7 +9,6 @@ stages:
   showOnlyErrors: false
 - name: Stage
   program: echo
-  args:
-  - '"Hello world!"'
+  args: []
   expectFail: false
   showOnlyErrors: false
