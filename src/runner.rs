@@ -25,6 +25,8 @@ impl Runner {
             .output()
             .expect("Failed to run program. Thread panicked.");
 
+        Term::info(&format!("Program exit code: {}", result.status.code().unwrap()));
+
         if stage.expectFail {
             if !result.status.success() {
                 Term::success("Stage passed.");
@@ -33,7 +35,7 @@ impl Runner {
                 exit(1);
             }
         } else {
-            if result.status.success() {
+            if result.status.code().unwrap() == stage.expectedExitCode {
                 Term::success("Stage passed.");
             } else {
                 Term::fatal("Stage failed!");

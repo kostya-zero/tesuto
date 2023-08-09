@@ -48,8 +48,8 @@ fn main() {
                 exit(1);
             }
 
-
-
+            Term::warn("Option `expectedExitCode` will be ignored, because `expectFail` are true.");
+            
             println!("{:?}", project.stages.clone());
 
             for i in project.stages {

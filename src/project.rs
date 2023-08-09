@@ -13,6 +13,8 @@ pub struct Stage {
     pub expectFail: bool,
     #[serde(default)]
     pub showOnlyErrors: bool,
+    #[serde(default)]
+    pub expectedExitCode: i32,
 }
 
 impl Default for Stage {
@@ -23,6 +25,7 @@ impl Default for Stage {
             args: vec![],
             expectFail: false,
             showOnlyErrors: false,
+            expectedExitCode: 0,
         }
     }
 }
