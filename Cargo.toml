@@ -1,6 +1,6 @@
 [package]
 name = "tesuto"
-description = "Lightweight and easy-to-use project testing tool."
+description = "Lightweight project testing tool."
 version = "0.1.0-dev"
 edition = "2021"
 
