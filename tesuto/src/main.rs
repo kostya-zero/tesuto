@@ -53,6 +53,33 @@ fn main() {
                 }
             }
         }
+        Some(("run-stage", sub)) => {
+            if !Path::new("tesuto.yml").exists() {
+                Term::error("Project file not found.");
+                exit(1);
+            }
+
+            let name: &str = sub.get_one::<String>("stage").unwrap();
+            let project: Project = Manager::load_project();
+
+            if !project.stage_exists(name) {
+                Term::error("Stage with given name not found.");
+                exit(1);
+            }
+
+            let stage = project.get_stage(name);
+
+            Term::message(format!("Running stage: {}", name).as_str());
+            match Runner::run_stage(stage) {
+                true => {
+                    Term::done("Stage passed.");
+                }
+                false => {
+                    Term::error("Aborting procedure...");
+                    exit(1);
+                }
+            }
+        }
         Some(("list", _sub)) => {
             if !Path::new("tesuto.yml").exists() {
                 Term::error("Project file not found.");

@@ -10,6 +10,13 @@ pub fn args() -> Command {
         .subcommands([
             Command::new("new").about("Create new project."),
             Command::new("run").about("Run project configuration."),
+            Command::new("run-stage").about("Run specific stage.").arg(
+                Arg::new("stage")
+                    .help("Name of stage to run.")
+                    .required(true)
+                    .num_args(1)
+                    .value_parser(clap::value_parser!(String)),
+            ),
             Command::new("list").about("List all stages in project."),
             Command::new("add").about("Add new stage to project.").arg(
                 Arg::new("name")

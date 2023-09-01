@@ -3,7 +3,12 @@ stages:
   hello:
     before_script: []
     script:
-    - ech "Hello $HELLO!"
-    variables: 
-      HELLO: "world"
+    - echo "Hello World!"
+    variables: {}
+    quite: false
+  spam:
+    before_script: []
+    script:
+    - echo "Hello World!"
+    variables: {}
     quite: false

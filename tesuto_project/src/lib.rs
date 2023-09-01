@@ -75,6 +75,14 @@ impl Project {
         self.stages.clone()
     }
 
+    pub fn get_stage(&self, name: &str) -> Stage {
+        self.stages.get(name).unwrap().clone()
+    }
+
+    pub fn stage_exists(&self, stage_name: &str) -> bool {
+        self.stages.contains_key(stage_name)
+    }
+
     pub fn add_stage(&mut self, name: &str, stage: Stage) {
         self.stages.insert(name.to_string(), stage);
     }
