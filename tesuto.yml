@@ -1,14 +1,9 @@
-options:
-  name: TesutoProject
-  requiredTools: []
+name: TesutoProject
 stages:
-- name: stage
-  program: ''
-  args: []
-  expectFail: false
-  showOnlyErrors: false
-- name: Stage
-  program: echo
-  args: []
-  expectFail: false
-  showOnlyErrors: false
+  hello:
+    before_script: []
+    script:
+    - ech "Hello $HELLO!"
+    variables: 
+      HELLO: "world"
+    quite: false
