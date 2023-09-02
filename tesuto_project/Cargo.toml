@@ -4,7 +4,7 @@ description = "Project structure library for Tesuto."
 authors = ["Konstantin Zhigaylo <kostya.zero@outlook.com>"]
 license = "MIT"
 readme = "../README.md"
-homepage = "https://gitlab.com/kostya-zero/tesuto"
+homepage = "https://github.com/kostya-zero/tesuto"
 version = "0.1.0"
 edition = "2021"
 
