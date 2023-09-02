@@ -137,3 +137,10 @@ Also, you can run specific stage with `run-stage` command.
 tesuto run-stage hello
 ```
 
+## Project layout
+```
+├─ imgs/           Images for README.
+├─ target/         Build directory
+├─ tesuto/         App source code.
+└─ tesuto_project/ Library that contains project structure for Tesuto.
+```
