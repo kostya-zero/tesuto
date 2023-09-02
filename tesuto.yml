@@ -1,4 +1,4 @@
-name: Test Project
+name: Tesuto
 stages:
   clippy:
     before_script: []
