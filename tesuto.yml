@@ -1,14 +1,14 @@
-name: TesutoProject
+name: Test Project
 stages:
-  hello:
+  clippy:
     before_script: []
-    script:
-    - echo "Hello World!"
+    script: 
+    - cargo clippy
     variables: {}
     quite: false
-  spam:
+  build:
     before_script: []
-    script:
-    - echo "Hello World!"
+    script: 
+    - cargo build
     variables: {}
     quite: false

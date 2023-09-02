@@ -15,7 +15,7 @@ impl Manager {
                 }
             },
             Err(_) => {
-                Term::error("Failed to read project file.");
+                Term::error("Failed to load project. Looks like it's bad structured.");
                 exit(1)
             }
         }
