@@ -21,7 +21,7 @@ impl Runner {
             Term::message("Running before scripts...");
             for i in stage.get_before_scripts() {
                 match Self::run_command(&i, stage.get_quite(), stage.get_variables()) {
-                    Ok(_) => Term::done("Success."),
+                    Ok(_) => {}
                     Err(err) => match err {
                         RunError::BadExitCode => {
                             Term::error("Script failed because command exited with bad exit code.");
@@ -52,7 +52,7 @@ impl Runner {
             Term::message("Running scripts...");
             for i in stage.get_scripts() {
                 match Self::run_command(&i, stage.get_quite(), stage.get_variables()) {
-                    Ok(_) => Term::done("Success."),
+                    Ok(_) => {}
                     Err(err) => match err {
                         RunError::BadExitCode => {
                             Term::error("Script failed because command exited with bad exit code.");
