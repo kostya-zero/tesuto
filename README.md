@@ -1,21 +1,18 @@
 # Tesuto
 
 Tesuto is a minimalist and lightweight tool for testing.
-Tesuto designed to be easy to configure and fast as possible.
-All jobs are cut into stages.
-Each stage have scripts that will be executabe before main scripts, scripts to run in this stage and environment variables.
-All of this options are specific for each stages.
-At that moment, Tesuto available on Linux only. In future I planned to add support for Windows and macOS.
+Tesuto designed to be easy to set up and be as fast as possible.
+Tesuto allows developers to focus on solving deployment problems.
 
-### Installation
+## Installation
 
 #### From releases
 
-1. Go to the releases section and choose version which you want to install.
+1. Go to the releases section and select the version you want to install.
 2. Download archive and unpack it.
-3. Place executable file to the place that exists in `PATH` environment variable.
+3. Place executable file to the location that exists in  the `PATH` environment variable.
 
-> If you cant run executable because `permission denied`, run `sudo chmod +x <path_to_tesuto>` to make it possible to run.
+> If you cant run executable with error `permission denied`, run `sudo chmod +x <path_to_tesuto>` to make it possible to run it.
 
 #### From crates.io
 
@@ -30,11 +27,11 @@ At that moment, Tesuto available on Linux only. In future I planned to add suppo
 3. Run `git checkout latest` to use sources from latest version or `git checkout main` to use unstable version.
 4. You can run `cargo build` to build executable with debug info or `cargo build --releases` to build version with optimizations.
 
-# Configuration
+## Configuration
 
 ### Generate new project
-After installation, open terminal and enter directory with yout project where you want to use Tesuto.
-Next, we need to create new project file:
+After installation, open a terminal and enter the directory with your project in which you want to use Tesuto.
+Next, you need to create a new project file:
 
 ```shell
 tesuto new
@@ -77,12 +74,12 @@ For example, let's create new stages called `spam`.
 tesuto add spam
 ```
 
-Now we have new stage in our project. 
-Let's add new command to stage.
+Now we have a new stage in our project. 
+Let's add a new command to stage.
 
-We are going to edit `script` option.
-In YAML to add new string to array, we use `-` prefix for it.
-Let's add `echo` again and now it will print "Hello again!":
+To do this, let's edit `script` option.
+In YAML, to add a new string to an array, we use `-` prefix.
+Let's add `echo` again, but now "Hello again!" will be printed:
 
 ```yaml
   spam:
@@ -116,7 +113,7 @@ Let's add `HELLO` variable with `Hello` value and try to print it via last `echo
     quite: false
 ```
 
-But why we doesn't add `-` prefix? 
+But why don't we add the `-` prefix? 
 Because it's not an array. 
 It's an option.
 

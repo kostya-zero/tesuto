@@ -1,5 +1,10 @@
 [package]
 name = "tesuto"
+description = "Lightweight testing tool."
+authors = ["Konstantin Zhigaylo <kostya.zero@outlook.com>"]
+readme = "../README.md"
+license = "MIT"
+homepage = "https://gitlab.com/kostya-zero/tesuto"
 version = "0.1.0"
 edition = "2021"
 
