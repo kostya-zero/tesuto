@@ -1,5 +1,7 @@
 # Tesuto
 
+<img src="imgs/logo.svg" align="right" width="128px">
+
 Tesuto is a minimalist and lightweight tool for testing.
 Tesuto designed to be easy to set up and be as fast as possible.
 Tesuto allows developers to focus on solving deployment problems.
