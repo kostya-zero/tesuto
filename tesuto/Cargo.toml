@@ -5,12 +5,12 @@ authors = ["Konstantin Zhigaylo <kostya.zero@outlook.com>"]
 readme = "../README.md"
 license = "MIT"
 homepage = "https://github.com/kostya-zero/tesuto"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies.tesuto_project]
 path = "../tesuto_project"
-version = "0.1.0"
+version = "0.1.1"
 
 [dependencies]
 clap = "4.4.1"
