@@ -1,5 +1,5 @@
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
 
 pub type Stages = HashMap<String, Stage>;
 pub type Vars = HashMap<String, String>;
@@ -54,10 +54,15 @@ pub struct Project {
 impl Default for Project {
     fn default() -> Self {
         let mut default_stage: Stages = HashMap::new();
-        default_stage.insert(String::from("hello"), Stage { ..Default::default() });
+        default_stage.insert(
+            String::from("hello"),
+            Stage {
+                ..Default::default()
+            },
+        );
         Self {
             name: String::from("TesutoProject"),
-            stages: default_stage 
+            stages: default_stage,
         }
     }
 }

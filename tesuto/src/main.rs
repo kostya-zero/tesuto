@@ -40,9 +40,9 @@ fn main() {
                 exit(0);
             }
 
-            for (k, v) in stages {
+            for (k, v) in stages.iter() {
                 Term::message(format!("Current stage: {}", k).as_str());
-                match Runner::run_stage(v) {
+                match Runner::run_stage(v.clone()) {
                     true => {
                         Term::done("Stage passed.");
                     }
