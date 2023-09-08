@@ -196,6 +196,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "tesuto_parser"
+version = "0.1.0"
+
+[[package]]
 name = "tesuto_project"
 version = "0.1.1"
 dependencies = [
