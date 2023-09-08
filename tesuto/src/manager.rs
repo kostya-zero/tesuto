@@ -10,7 +10,7 @@ impl Manager {
             Ok(project_string) => match serde_yaml::from_str::<Project>(&project_string) {
                 Ok(project) => project,
                 Err(_) => {
-                    Term::error("Failed to read project file.");
+                    Term::error("Failed to format file content as structure.");
                     exit(1)
                 }
             },

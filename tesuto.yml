@@ -1,14 +1,17 @@
 name: Tesuto
+scenarios:
+  test:
+  - hello
 stages:
-  clippy:
-    before_script: []
-    script: 
-    - cargo clippy
-    variables: {}
-    quite: false
   build:
     before_script: []
-    script: 
+    script:
     - cargo build
+    variables: {}
+    quite: false
+  clippy:
+    before_script: []
+    script:
+    - cargo clippy
     variables: {}
     quite: false

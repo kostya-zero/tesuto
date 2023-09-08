@@ -48,7 +48,8 @@ impl Stage {
 #[derive(Serialize, Deserialize)]
 pub struct Project {
     name: String,
-    scenarious: HashMap<String, Vec<String>>,
+    #[serde(default)]
+    scenarios: HashMap<String, Vec<String>>,
     stages: Stages,
 }
 
@@ -64,7 +65,7 @@ impl Default for Project {
         Self {
             name: String::from("TesutoProject"),
             stages: default_stage,
-            scenarious: HashMap::new(),
+            scenarios: HashMap::new(),
         }
     }
 }
@@ -95,10 +96,15 @@ impl Project {
     }
 
     pub fn scenario_exists(&self, name: &str) -> bool {
-        self.scenarious.contains_key(name)
+        self.scenarios.contains_key(name)
     }
 
     pub fn get_scenario(&self, name: &str) -> Vec<String> {
-        self.scenarious.get(name).unwrap().clone()
+        self.scenarios.get(name).unwrap().clone()
+    }
+
+    pub fn add_scenario(&mut self, name: &str) {
+        self.scenarios
+            .insert(String::from(name), vec!["hello".to_string()]);
     }
 }

@@ -1,4 +1,4 @@
-use std::{path::Path, process::exit};
+use std::{collections::HashMap, path::Path, process::exit};
 
 use args::args;
 use clap::ArgMatches;
@@ -25,15 +25,28 @@ fn main() {
             Manager::write_project(new_project);
             Term::done("Project created. It's saved as `tesuto.yml`.");
         }
-        Some(("run", _sub)) => {
+        Some(("run", sub)) => {
             if !Path::new("tesuto.yml").exists() {
                 Term::error("Project file not found.");
                 exit(1);
             }
 
             let project = Manager::load_project();
+            let mut stages: Stages = HashMap::new();
+            let scenario: &str = sub.get_one::<String>("scenario").unwrap();
+            if scenario.is_empty() {
+                for i in project.get_stages().iter() {
+                    stages.insert(i.0.clone(), i.1.clone());
+                }
+            } else if project.scenario_exists(scenario) {
+                let scenario_info: Vec<String> = project.get_scenario(scenario);
+                for i in project.get_stages().iter() {
+                    if scenario_info.contains(i.0) {
+                        stages.insert(i.0.clone(), i.1.clone());
+                    }
+                }
+            }
             Term::message(format!("Running project: {}", project.get_project_name()).as_str());
-            let stages: Stages = project.get_stages();
 
             if stages.is_empty() {
                 Term::message("Nothing to run...");
@@ -109,6 +122,23 @@ fn main() {
             project.add_stage(name, Stage::default());
             Manager::write_project(project);
             Term::done("Stage added.");
+        }
+        Some(("add-scenario", sub)) => {
+            if !Path::new("tesuto.yml").exists() {
+                Term::error("Project file not found.");
+                exit(1);
+            }
+
+            let name: &str = sub.get_one::<String>("name").unwrap();
+            let mut project: Project = Manager::load_project();
+            if project.scenario_exists(name) {
+                Term::error("Scenario with same name already exists.");
+                exit(1);
+            }
+
+            project.add_scenario(name);
+            Manager::write_project(project);
+            Term::done("Scenario added.");
         }
         _ => Term::error("Unknown command."),
     }
