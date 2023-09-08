@@ -32,20 +32,8 @@ fn main() {
             }
 
             let project = Manager::load_project();
-            let mut stages: Stages = HashMap::new();
+            let mut stages: Stages = project.get_stages();
             let scenario: &str = sub.get_one::<String>("scenario").unwrap();
-            if scenario.is_empty() {
-                for i in project.get_stages().iter() {
-                    stages.insert(i.0.clone(), i.1.clone());
-                }
-            } else if project.scenario_exists(scenario) {
-                let scenario_info: Vec<String> = project.get_scenario(scenario);
-                for i in project.get_stages().iter() {
-                    if scenario_info.contains(i.0) {
-                        stages.insert(i.0.clone(), i.1.clone());
-                    }
-                }
-            }
             Term::message(format!("Running project: {}", project.get_project_name()).as_str());
 
             if stages.is_empty() {
