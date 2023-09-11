@@ -2,7 +2,6 @@
 members = [
     "tesuto",
     "tesuto_project",
-    "tesuto_parser",
 ]
 resolver = "2"
 
