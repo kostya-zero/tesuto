@@ -41,9 +41,9 @@ fn main() {
                 exit(0);
             }
 
-            for (k, v) in stages.iter() {
-                Term::message(format!("Current stage: {}", k).as_str());
-                match Runner::run_stage(v.clone()) {
+            for stage in stages.iter() {
+                Term::message(format!("Current stage: {}", stage.get_name()).as_str());
+                match Runner::run_stage(stage.clone()) {
                     true => {
                         Term::done("Stage passed.");
                     }
@@ -68,7 +68,7 @@ fn main() {
                 exit(1);
             }
 
-            let stage = project.get_stage(name);
+            let stage: Stage = project.get_stage(name);
 
             Term::message(format!("Running stage: {}", name).as_str());
             match Runner::run_stage(stage) {
@@ -89,8 +89,8 @@ fn main() {
 
             let project = Manager::load_project();
             Term::message("Stages in this project:");
-            for (k, _) in project.get_stages().iter() {
-                Term::no_icon_message(k.as_str());
+            for i in project.get_stages().iter() {
+                Term::no_icon_message(i.get_name().as_str());
             }
         }
         Some(("add", sub)) => {
@@ -101,32 +101,16 @@ fn main() {
 
             let name: &str = sub.get_one::<String>("name").unwrap();
             let mut project: Project = Manager::load_project();
-            let stages: Stages = project.get_stages();
-            if stages.contains_key(name) {
+            if project.stage_exists(name) {
                 Term::error("Stage with same name already exists.");
                 exit(1);
             }
 
-            project.add_stage(name, Stage::default());
+            let mut new_stage: Stage = Stage::default();
+            new_stage.set_name(name);
+            project.add_stage(new_stage);
             Manager::write_project(project);
             Term::done("Stage added.");
-        }
-        Some(("add-scenario", sub)) => {
-            if !Path::new("tesuto.yml").exists() {
-                Term::error("Project file not found.");
-                exit(1);
-            }
-
-            let name: &str = sub.get_one::<String>("name").unwrap();
-            let mut project: Project = Manager::load_project();
-            if project.scenario_exists(name) {
-                Term::error("Scenario with same name already exists.");
-                exit(1);
-            }
-
-            project.add_scenario(name);
-            Manager::write_project(project);
-            Term::done("Scenario added.");
         }
         _ => Term::error("Unknown command."),
     }

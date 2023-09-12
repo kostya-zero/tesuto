@@ -10,7 +10,7 @@ edition = "2021"
 
 [dependencies.tesuto_project]
 path = "../tesuto_project"
-version = "0.1.1"
+version = "0.2.0-dev"
 
 [dependencies]
 clap = "4.4.1"

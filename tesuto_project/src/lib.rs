@@ -1,25 +1,40 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
-pub type Stages = HashMap<String, Stage>;
-pub type Vars = HashMap<String, String>;
+pub type Stages = Vec<Stage>;
+pub type Vars = Vec<Variable>;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Stage {
-    before_script: Vec<String>,
+    name: String,
     script: Vec<String>,
-    variables: Vars,
-    quite: bool,
+    variables: Option<Vars>,
+    quite: Option<bool>,
 }
 
 impl Default for Stage {
     fn default() -> Self {
         Self {
-            before_script: vec![],
+            name: String::new(),
             script: vec!["echo \"Hello World!\"".to_string()],
-            variables: HashMap::new(),
-            quite: false,
+            variables: Some(Vec::new()),
+            quite: Some(false),
         }
+    }
+}
+
+#[derive(Default, Serialize, Deserialize, Clone)]
+pub struct Variable {
+    name: String,
+    value: String,
+}
+
+impl Variable {
+    pub fn get_name(&self) -> String {
+        self.name.clone()
+    }
+
+    pub fn get_value(&self) -> String {
+        self.value.clone()
     }
 }
 
@@ -28,19 +43,24 @@ impl Stage {
         Self::default()
     }
 
-    pub fn get_before_scripts(&self) -> Vec<String> {
-        self.before_script.clone()
+    pub fn get_name(&self) -> String {
+        self.name.clone()
+    }
+
+    pub fn set_name(&mut self, name: &str) {
+        self.name.clear();
+        self.name.push_str(name);
     }
 
     pub fn get_scripts(&self) -> Vec<String> {
         self.script.clone()
     }
 
-    pub fn get_variables(&self) -> Vars {
+    pub fn get_variables(&self) -> Option<Vars> {
         self.variables.clone()
     }
 
-    pub fn get_quite(&self) -> bool {
+    pub fn get_quite(&self) -> Option<bool> {
         self.quite
     }
 }
@@ -48,24 +68,14 @@ impl Stage {
 #[derive(Serialize, Deserialize)]
 pub struct Project {
     name: String,
-    #[serde(default)]
-    scenarios: HashMap<String, Vec<String>>,
     stages: Stages,
 }
 
 impl Default for Project {
     fn default() -> Self {
-        let mut default_stage: Stages = HashMap::new();
-        default_stage.insert(
-            String::from("hello"),
-            Stage {
-                ..Default::default()
-            },
-        );
         Self {
             name: String::from("TesutoProject"),
-            stages: default_stage,
-            scenarios: HashMap::new(),
+            stages: vec![Stage::default()],
         }
     }
 }
@@ -83,28 +93,20 @@ impl Project {
         self.stages.clone()
     }
 
+    pub fn get_stage_index(&self, name: &str) -> usize {
+        self.stages.iter().position(|i| i.name.eq(name)).unwrap()
+    }
+
     pub fn get_stage(&self, name: &str) -> Stage {
-        self.stages.get(name).unwrap().clone()
+        let index = self.get_stage_index(name);
+        self.stages[index].clone()
     }
 
-    pub fn stage_exists(&self, stage_name: &str) -> bool {
-        self.stages.contains_key(stage_name)
+    pub fn add_stage(&mut self, new_stage: Stage) {
+        self.stages.push(new_stage);
     }
 
-    pub fn add_stage(&mut self, name: &str, stage: Stage) {
-        self.stages.insert(name.to_string(), stage);
-    }
-
-    pub fn scenario_exists(&self, name: &str) -> bool {
-        self.scenarios.contains_key(name)
-    }
-
-    pub fn get_scenario(&self, name: &str) -> Vec<String> {
-        self.scenarios.get(name).unwrap().clone()
-    }
-
-    pub fn add_scenario(&mut self, name: &str) {
-        self.scenarios
-            .insert(String::from(name), vec!["hello".to_string()]);
+    pub fn stage_exists(&self, name: &str) -> bool {
+        self.stages.iter().any(|i| i.get_name().eq(name))
     }
 }
