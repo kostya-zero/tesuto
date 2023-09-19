@@ -25,15 +25,14 @@ fn main() {
             Manager::write_project(new_project);
             Term::done("Project created. It's saved as `tesuto.yml`.");
         }
-        Some(("run", sub)) => {
+        Some(("run", _sub)) => {
             if !Path::new("tesuto.yml").exists() {
                 Term::error("Project file not found.");
                 exit(1);
             }
 
             let project = Manager::load_project();
-            let mut stages: Stages = project.get_stages();
-            let scenario: &str = sub.get_one::<String>("scenario").unwrap();
+            let stages: Stages = project.get_stages();
             Term::message(format!("Running project: {}", project.get_project_name()).as_str());
 
             if stages.is_empty() {
