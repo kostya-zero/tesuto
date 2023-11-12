@@ -1,53 +1,7 @@
-name: Tesuto
-scenarios:
-  test:
-  - hello
+name: TesutoProject
 stages:
-  clippy:
-    before_script: []
-    script:
-    - cargo clippy
-    variables: {}
-    quite: false
-  tests:
-    before_script: []
-    script:
-    - echo "Hello World!"
-    variables: {}
-    quite: false
-  test3:
-    before_script: []
-    script:
-    - echo "Hello World!"
-    variables: {}
-    quite: false
-  tests2:
-    before_script: []
-    script:
-    - echo "Hello World!"
-    variables: {}
-    quite: false
-  test2222:
-    before_script: []
-    script:
-    - echo "Hello World!"
-    variables: {}
-    quite: false
-  tests1:
-    before_script: []
-    script:
-    - echo "Hello World!"
-    variables: {}
-    quite: false
-  build:
-    before_script: []
-    script:
-    - cargo build
-    variables: {}
-    quite: false
-  test:
-    before_script: []
-    script:
-    - echo "Hello World!"
-    variables: {}
-    quite: false
+- name: 'Hello'
+  script:
+  - echo "Hello World!"
+  variables: []
+  quite: false

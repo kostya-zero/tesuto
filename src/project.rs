@@ -1,11 +1,13 @@
+use std::collections::{HashMap, BTreeMap};
+
 use serde::{Deserialize, Serialize};
 
-pub type Stages = Vec<Stage>;
+pub type Stages = BTreeMap<String, Stage>;
 pub type Vars = Vec<Variable>;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Stage {
-    name: String,
+    name: Option<String>,
     script: Vec<String>,
     variables: Option<Vars>,
     quite: Option<bool>,
@@ -14,7 +16,7 @@ pub struct Stage {
 impl Default for Stage {
     fn default() -> Self {
         Self {
-            name: String::new(),
+            name: Some(String::new()),
             script: vec!["echo \"Hello World!\"".to_string()],
             variables: Some(Vec::new()),
             quite: Some(false),
@@ -43,13 +45,12 @@ impl Stage {
         Self::default()
     }
 
-    pub fn get_name(&self) -> String {
+    pub fn get_name(&self) -> Option<String> {
         self.name.clone()
     }
 
     pub fn set_name(&mut self, name: &str) {
-        self.name.clear();
-        self.name.push_str(name);
+        self.name = Some(String::from(name));
     }
 
     pub fn get_scripts(&self) -> Vec<String> {
@@ -73,10 +74,7 @@ pub struct Project {
 
 impl Default for Project {
     fn default() -> Self {
-        Self {
-            name: String::from("TesutoProject"),
-            stages: vec![Stage::default()],
-        }
+        Self { name: "TesutoProject".to_string(), stages: BTreeMap::from([("hello-job".to_string(), Stage::default())]) }
     }
 }
 
@@ -93,20 +91,11 @@ impl Project {
         self.stages.clone()
     }
 
-    pub fn get_stage_index(&self, name: &str) -> usize {
-        self.stages.iter().position(|i| i.name.eq(name)).unwrap()
-    }
-
     pub fn get_stage(&self, name: &str) -> Stage {
-        let index = self.get_stage_index(name);
-        self.stages[index].clone()
-    }
-
-    pub fn add_stage(&mut self, new_stage: Stage) {
-        self.stages.push(new_stage);
+        self.stages[name].clone()
     }
 
     pub fn stage_exists(&self, name: &str) -> bool {
-        self.stages.iter().any(|i| i.get_name().eq(name))
+        self.stages.iter().any(|i| i.0.eq(name))
     }
 }

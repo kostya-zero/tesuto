@@ -41,8 +41,13 @@ fn main() {
             }
 
             for stage in stages.iter() {
-                Term::message(format!("Current stage: {}", stage.get_name()).as_str());
-                match Runner::run_stage(stage.clone()) {
+                let stage_name: &str = if let Some(name) = &stage.1.get_name() {
+                    name
+                } else {
+                    &stage.0
+                };
+                Term::message(format!("Current stage: {}", stage_name).as_str());
+                match Runner::run_stage(stage.1.clone()) {
                     true => {
                         Term::done("Stage passed.");
                     }
@@ -89,7 +94,7 @@ fn main() {
             let project = Manager::load_project();
             Term::message("Stages in this project:");
             for i in project.get_stages().iter() {
-                Term::no_icon_message(i.get_name().as_str());
+                Term::no_icon_message(i.0.as_str());
             }
         }
         Some(("add", sub)) => {
@@ -107,7 +112,6 @@ fn main() {
 
             let mut new_stage: Stage = Stage::default();
             new_stage.set_name(name);
-            project.add_stage(new_stage);
             Manager::write_project(project);
             Term::done("Stage added.");
         }

@@ -1,11 +1,14 @@
-[workspace]
-members = [
-    "tesuto",
-    "tesuto_project",
-]
-resolver = "2"
+[package]
+name = "tesuto"
+description = "Lightweight testing tool."
+authors = ["Konstantin Zhigaylo <kostya.zero@outlook.com>"]
+readme = "../README.md"
+license = "MIT"
+homepage = "https://github.com/kostya-zero/tesuto"
+version = "0.2.0-dev"
+edition = "2021"
 
-[profile.release]
-opt-level = 3
-lto = "thin"
-
+[dependencies]
+clap = "4.4.1"
+serde = { version = "1.0.188", features = ["derive"] }
+serde_yaml = "0.9.25"
