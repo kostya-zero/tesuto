@@ -3,12 +3,13 @@ use std::{collections::HashMap, path::Path, process::exit};
 use args::args;
 use clap::ArgMatches;
 use manager::Manager;
+use project::{Action, Project};
 use runner::Runner;
 use term::Term;
-use tesuto_project::{Project, Stage, Stages};
 
 mod args;
 mod manager;
+mod project;
 mod runner;
 mod term;
 
@@ -32,10 +33,9 @@ fn main() {
             }
 
             let project = Manager::load_project();
-            let stages: Stages = project.get_stages();
-            Term::message(format!("Running project: {}", project.get_project_name()).as_str());
+            Term::message(format!("Running project: {}", project.get_name()).as_str());
 
-            if stages.is_empty() {
+            if project.is_jobs_empty() {
                 Term::message("Nothing to run...");
                 exit(0);
             }

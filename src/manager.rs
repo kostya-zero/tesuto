@@ -1,7 +1,6 @@
 use std::{fs, process::exit};
-use tesuto_project::Project;
 
-use crate::term::Term;
+use crate::{project::Project, term::Term};
 
 pub struct Manager;
 impl Manager {
