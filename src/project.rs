@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct Action {
     name: Option<String>,
     program: Option<String>,
@@ -11,40 +11,36 @@ pub struct Action {
 
 impl Action {
     pub fn is_name_empty(&self) -> bool {
-        if self.name.is_none() || self.name.unwrap().is_empty() {
+        if self.name.is_none() || self.name.as_ref().unwrap().is_empty() {
             return true;
         }
         false
     }
-
     pub fn is_program_empty(&self) -> bool {
-        if self.program.is_none() || self.program.unwrap().is_empty() {
+        if self.program.is_none() || self.program.as_ref().unwrap().is_empty() {
             return true;
         }
         false
     }
-
     pub fn is_args_empty(&self) -> bool {
-        if self.args.is_none() || self.args.unwrap().is_empty() {
+        if self.args.is_none() || self.args.as_ref().unwrap().is_empty() {
             return true;
         }
         false
     }
-
     pub fn get_name(&self) -> String {
-        self.name.unwrap().clone()
+        self.name.as_ref().unwrap().clone()
     }
 
     pub fn get_program(&self) -> String {
-        self.program.unwrap().clone()
+        self.program.as_ref().unwrap().clone()
     }
-
     pub fn get_args(&self) -> Vec<String> {
-        self.args.unwrap().clone()
+        self.args.as_ref().unwrap().clone()
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct Project {
     name: Option<String>,
     require: Option<Vec<String>>,
@@ -72,18 +68,25 @@ impl Default for Project {
 
 impl Project {
     pub fn get_name(&self) -> String {
-        self.name.unwrap_or(String::from("Unnamed")).clone()
+        let name = self.name.clone();
+        name.unwrap_or(String::new())
     }
 
-    pub fn get_require(&self) -> Vec<String> {
-        self.require.unwrap_or(Vec::new()).clone()
+    pub fn get_require(&self) -> Option<Vec<String>> {
+        self.require.clone()
     }
 
     pub fn get_jobs(&self) -> BTreeMap<String, Vec<Action>> {
-        self.jobs.unwrap_or(BTreeMap::new())
+        let jobs = self.jobs.clone();
+        jobs.unwrap_or(BTreeMap::new())
     }
 
     pub fn is_jobs_empty(&self) -> bool {
-        self.jobs.is_none() || self.jobs.unwrap().is_empty()
+        self.jobs.is_none() || self.jobs.as_ref().unwrap().is_empty()
+    }
+
+    pub fn is_job_exists(&self, job_name: &str) -> bool {
+        let jobs = self.jobs.clone();
+        jobs.unwrap().contains_key(job_name)
     }
 }

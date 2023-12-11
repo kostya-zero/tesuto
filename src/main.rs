@@ -1,9 +1,9 @@
-use std::{collections::HashMap, path::Path, process::exit};
+use std::{path::Path, process::exit};
 
 use args::args;
 use clap::ArgMatches;
 use manager::Manager;
-use project::{Action, Project};
+use project::Project;
 use runner::Runner;
 use term::Term;
 
@@ -40,50 +40,28 @@ fn main() {
                 exit(0);
             }
 
-            for stage in stages.iter() {
-                let stage_name: &str = if let Some(name) = &stage.1.get_name() {
-                    name
-                } else {
-                    &stage.0
-                };
-                Term::message(format!("Current stage: {}", stage_name).as_str());
-                match Runner::run_stage(stage.1.clone()) {
-                    true => {
-                        Term::done("Stage passed.");
+            for job in project.get_jobs() {
+                for action in job.1 {
+                    if !action.is_name_empty() {
+                        Term::message(action.get_name().as_str());
+                    } else if !action.is_program_empty() {
+                        Term::message(format!("Running `{}`", action.get_program()).as_str());
                     }
-                    false => {
-                        Term::error("Aborting procedure...");
-                        exit(1);
+
+                    if !action.is_program_empty() {
+                        let command = action.get_program();
+                        let mut args: Vec<String> = Vec::new();
+                        if !action.is_args_empty() {
+                            args = action.get_args();
+                        }
+                        if !Runner::run_command(command.as_str(), args) {
+                            Term::error("Job failed. Aborting procedure...");
+                            exit(1);
+                        }
                     }
                 }
             }
-        }
-        Some(("run-stage", sub)) => {
-            if !Path::new("tesuto.yml").exists() {
-                Term::error("Project file not found.");
-                exit(1);
-            }
-
-            let name: &str = sub.get_one::<String>("stage").unwrap();
-            let project: Project = Manager::load_project();
-
-            if !project.stage_exists(name) {
-                Term::error("Stage with given name not found.");
-                exit(1);
-            }
-
-            let stage: Stage = project.get_stage(name);
-
-            Term::message(format!("Running stage: {}", name).as_str());
-            match Runner::run_stage(stage) {
-                true => {
-                    Term::done("Stage passed.");
-                }
-                false => {
-                    Term::error("Aborting procedure...");
-                    exit(1);
-                }
-            }
+            Term::done("Tesuto finished his work.");
         }
         Some(("list", _sub)) => {
             if !Path::new("tesuto.yml").exists() {
@@ -93,27 +71,6 @@ fn main() {
 
             let project = Manager::load_project();
             Term::message("Stages in this project:");
-            for i in project.get_stages().iter() {
-                Term::no_icon_message(i.0.as_str());
-            }
-        }
-        Some(("add", sub)) => {
-            if !Path::new("tesuto.yml").exists() {
-                Term::error("Project file not found.");
-                exit(1);
-            }
-
-            let name: &str = sub.get_one::<String>("name").unwrap();
-            let mut project: Project = Manager::load_project();
-            if project.stage_exists(name) {
-                Term::error("Stage with same name already exists.");
-                exit(1);
-            }
-
-            let mut new_stage: Stage = Stage::default();
-            new_stage.set_name(name);
-            Manager::write_project(project);
-            Term::done("Stage added.");
         }
         _ => Term::error("Unknown command."),
     }
