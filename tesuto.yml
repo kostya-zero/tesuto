@@ -1,7 +1,0 @@
-name: TesutoProject
-stages:
-- name: 'Hello'
-  script:
-  - echo "Hello World!"
-  variables: []
-  quite: false
