@@ -36,7 +36,6 @@ Look up in [CONFIGURATION.md](CONFIGURATION.md) file for guides.
 ## Project layout
 ```
 ├─ imgs/           Images for README.
-├─ target/         Build directory
-├─ tesuto/         App source code.
-└─ tesuto_project/ Library that contains project structure for Tesuto.
+├─ target/         Build directory.
+└─ tesuto/         App source code.
 ```
