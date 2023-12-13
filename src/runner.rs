@@ -1,6 +1,6 @@
 use crate::term::Term;
 use std::io::ErrorKind;
-use std::process::{Command, exit, Stdio};
+use std::process::{Command, Stdio};
 use crate::project::Action;
 
 pub struct Runner;

@@ -86,7 +86,14 @@ fn main() {
             }
 
             let project = Manager::load_project();
-            Term::message("Stages in this project:");
+            if project.is_jobs_empty() {
+                Term::warn("This project has no jobs.");
+                exit(0);
+            }
+            Term::message("Jobs in this project:");
+            for job in project.get_jobs() {
+                Term::no_icon_message(job.0.as_str());
+            }
         }
         _ => Term::error("Unknown command."),
     }
