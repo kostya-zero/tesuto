@@ -1,10 +1,10 @@
 [package]
 name = "tesuto"
 description = "Lightweight testing tool."
-authors = ["Konstantin Zhigaylo <kostya.zero@outlook.com>"]
-readme = "../README.md"
+authors = ["Konstantin Zhigaylo <zero@kostyazero.com>"]
+readme = "README.md"
 license = "MIT"
-homepage = "https://github.com/kostya-zero/tesuto"
+homepage = "https://git.kostyazero.com/kostya-zero/tesuto"
 version = "0.2.0-dev"
 edition = "2021"
 

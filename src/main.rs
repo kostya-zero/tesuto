@@ -36,33 +36,49 @@ fn main() {
             Term::message(format!("Running project: {}", project.get_name()).as_str());
 
             if project.is_jobs_empty() {
-                Term::message("Nothing to run...");
+                Term::message("Nothing to run.");
                 exit(0);
             }
 
             for job in project.get_jobs() {
                 for action in job.1 {
-                    if !action.is_name_empty() {
-                        Term::message(action.get_name().as_str());
-                    } else if !action.is_program_empty() {
-                        Term::message(format!("Running `{}`", action.get_program()).as_str());
-                    }
-
-                    if !action.is_program_empty() {
-                        let command = action.get_program();
-                        let mut args: Vec<String> = Vec::new();
-                        if !action.is_args_empty() {
-                            args = action.get_args();
-                        }
-                        if !Runner::run_command(command.as_str(), args) {
-                            Term::error("Job failed. Aborting procedure...");
-                            exit(1);
-                        }
+                    if !Runner::run_action(action) {
+                        Term::error(format!("Job `{}` failed to run. Exiting...", job.0).as_str());
+                        exit(1);
                     }
                 }
             }
             Term::done("Tesuto finished his work.");
         }
+        Some(("run-job", sub)) => {
+            if !Path::new("tesuto.yml").exists() {
+                Term::error("Project file not found.");
+                exit(1);
+            }
+
+            if let Some(job) = sub.get_one::<String>("job") {
+                if job.is_empty() {
+                    Term::error("Job not specified.");
+                    exit(1);
+                }
+
+                let project = Manager::load_project();
+                if !project.is_job_exists(job) {
+                    Term::error("Job not found.");
+                    exit(1);
+                }
+
+                let jobs = project.get_jobs();
+                let job_item = jobs.get(job).unwrap();
+                for action in job_item {
+                    if !Runner::run_action(action.clone()) {
+                        Term::error(format!("Job `{}` failed to run. Exiting...", job).as_str());
+                        exit(1);
+                    }
+                }
+                Term::done("Tesuto finished his work.");
+            }
+        },
         Some(("list", _sub)) => {
             if !Path::new("tesuto.yml").exists() {
                 Term::error("Project file not found.");
