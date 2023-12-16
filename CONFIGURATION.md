@@ -8,13 +8,11 @@ This guide will help you to configure your Tesuto project.
 - - [Create new project](#create-new-project)
 - - [Project file](#project-file)
 - [Configure project](#configure-project)
-- - [Add new stage](#add-new-stage)
-- - [Add script to stage](#add-script-to-stage)
-- - [Add environment variables](#add-environment-variables)
-- - [Run stage without output](#run-stage-without-output)
+- - [Add new job](#add-new-job)
+- - [More about actions](#more-about-actions)
 - [Running project](#running-project)
 - - [Run whole project](#run-whole-project)
-- - [Run specific stage](#run-specific-stage)
+- - [Run specific job](#run-specific-job)
 
 ## Getting started
 
@@ -41,7 +39,7 @@ jobs:
         - Hello world!
 ```
 
-The `name` field need to make it easier to recognize for which project this configuration is made.
+The `name` field need to make it easier to recognize for which project this configuration was made.
 
 ## Configure project
 
@@ -50,6 +48,16 @@ The `name` field need to make it easier to recognize for which project this conf
 With new jobs system in 0.2.0 version you can group all action into jobs.
 To make new job you need to add new entry to `jobs` section.
 Each job contains **list of actions**.
+
+For example, you can left only `name` field and use it as message.
+
+```yaml
+...
+build-job:
+  - name: Building project.
+...
+```
+
 Let's add new job called `new-job` and add action that will display "Hello again".
 
 ```yaml
@@ -66,29 +74,25 @@ jobs:
         - Hello again
 ```
 
-You may have question - why didn't we add `name` field to the action in new job?
-Because it's optional, like every field in action. 
 
-Also, you can use only `name` field to display information if you need. E.g.:
+#### More about actions
+
+Action can contain 3 fields:
+- `name` - Text that will display and tell what this action going to do.
+- `program` - Program that will be executed.
+- `args` - Arguments for the program.
+
+Every field in action is optional.
+For example, you can left only `name` field and use it as message.
 
 ```yaml
 ...
-  prepare-job:
-    - name: Checkout branch
-      program: git
-      args:
-        - checkout
-        - origin/main
-    # Like this one:
-    - name: Prepare finished.
+build-job:
+  - name: Building project.
 ...
 ```
 
-#### Dive into actions
-
-As was said before, jobs is a list of actions that Tesuto need to run.
-Each action can contain name of program to run and arguments in `program` and `args` fields.
-If `args` field set but `program` not, Tesuto will ignore it both and display `name` field (if it's set).
+This is an example of how actions in jobs can look like:
 
 ```yaml
 ...
@@ -123,10 +127,10 @@ Just run `tesuto` with argument `run` to run project.
 tesuto run
 ```
 
-#### Run specific stage
+#### Run specific job
 
-To run specific stage, use `run-stage` argument and sepcify name of stage to run.
+To run specific job, use `run-job` argument and sepcify name of job to run.
 
 ```shell
-tesuto run-stage build
+tesuto run-job build-job
 ```
