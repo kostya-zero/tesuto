@@ -33,66 +33,84 @@ By default, it has this structure:
 
 ```yaml
 name: TesutoProject
-stages:
-- name: hello
-  script:
-  - echo "Hello World!"
-  variables: []
-  quite: false
+jobs:
+  hello-job:
+    - name: Print 'Hello world!'
+      program: echo
+      args:
+        - Hello world!
 ```
 
-The `name` field need to make it easier to recognize for which project this configuration is set.
+The `name` field need to make it easier to recognize for which project this configuration is made.
 
 ## Configure project
 
-#### Add new stage
+#### Add new job
 
-To add new stage to project, run Tesuto with argument `add` and provide name for new stage:
+With new jobs system in 0.2.0 version you can group all action into jobs.
+To make new job you need to add new entry to `jobs` section.
+Each job contains **list of actions**.
+Let's add new job called `new-job` and add action that will display "Hello again".
 
-```shell
-tesuto add build
+```yaml
+name: TesutoProject
+jobs:
+  hello-job:
+    - name: Print 'Hello world!'
+      program: echo
+      args:
+        - Hello world!
+  new-job:
+    - program: echo
+      args: 
+        - Hello again
 ```
 
-#### Add script to stage
+You may have question - why didn't we add `name` field to the action in new job?
+Because it's optional, like every field in action. 
 
-Open `tesuto.yml` in your favorite text editor and find section with stage that you want to change.
-Add new item to `script` section by adding new line and start it with `-`.
+Also, you can use only `name` field to display information if you need. E.g.:
 
 ```yaml
 ...
-- name: build
-  # script is an array, so to add new item it must start with `-`.
-  script: 
-  - cargo build --release
-  variables: []
-  quite: bool
+  prepare-job:
+    - name: Checkout branch
+      program: git
+      args:
+        - checkout
+        - origin/main
+    # Like this one:
+    - name: Prepare finished.
+...
 ```
 
-#### Add environment variables
+#### Dive into actions
 
-If you still have `tesuto.yml` open - great. 
-To add new variable you need to add new item to `variables` field with `name` and `value` fields.
-
-```yaml
-  ...
-  # variables, same as script, is an array, so when
-  # we adding new item we must start it first field with `-`.
-  variables: 
-    - name: HELLO_PHRASE
-      value: hello
-    - name: WORLD_PHRASE
-      value: world
-  ...
-```
-
-#### Run stage without output
-
-You can set option `quite` to true to get no output from stage when it running.
+As was said before, jobs is a list of actions that Tesuto need to run.
+Each action can contain name of program to run and arguments in `program` and `args` fields.
+If `args` field set but `program` not, Tesuto will ignore it both and display `name` field (if it's set).
 
 ```yaml
-  ...
-  quite: true
-  ...
+...
+  build-job:
+    - name: Run cargo build.
+      program: cargo
+      args:
+        - build
+        - --release
+        - --target=x86_64-unknown-linux-gnu
+    - name: Make zip package.
+    - program: cp
+      args: 
+        - target/release/app
+        - ./app
+    - program: tar
+      args: 
+        - -cvf
+        - app.tar.gz
+        - ./app
+    - name: Done.
+...
 ```
 
 ## Running project

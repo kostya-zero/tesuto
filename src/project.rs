@@ -43,7 +43,6 @@ impl Action {
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Project {
     name: Option<String>,
-    require: Option<Vec<String>>,
     jobs: Option<BTreeMap<String, Vec<Action>>>,
 }
 
@@ -60,7 +59,6 @@ impl Default for Project {
         );
         Self {
             name: Some(String::from("TesutoProject")),
-            require: Some(Vec::new()),
             jobs: Some(new_btree),
         }
     }
@@ -69,16 +67,12 @@ impl Default for Project {
 impl Project {
     pub fn get_name(&self) -> String {
         let name = self.name.clone();
-        name.unwrap_or(String::new())
-    }
-
-    pub fn get_require(&self) -> Option<Vec<String>> {
-        self.require.clone()
+        name.unwrap_or_default()
     }
 
     pub fn get_jobs(&self) -> BTreeMap<String, Vec<Action>> {
         let jobs = self.jobs.clone();
-        jobs.unwrap_or(BTreeMap::new())
+        jobs.unwrap_or_default()
     }
 
     pub fn is_jobs_empty(&self) -> bool {
