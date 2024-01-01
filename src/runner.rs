@@ -3,15 +3,23 @@ use std::io::ErrorKind;
 use std::process::{Command, Stdio};
 use crate::project::Action;
 
+pub enum RunnerError {
+    ProgramNotFound(String),
+    Interrupted,
+    BadExitCode(String),
+    DoneButFailed,
+    Unknown,
+}
+
 pub struct Runner;
 impl Runner {
-    pub fn run_action(action: Action) -> bool {
+    pub fn run_action(action: Action) -> Result<(), RunnerError> {
         if !action.is_name_empty() {
             Term::message(action.get_name().as_str());
         } else if !action.is_program_empty() {
             Term::message(format!("Running `{}`", action.get_program()).as_str());
         } else {
-            return true;
+            return Ok(());
         }
 
         if !action.is_program_empty() {
@@ -20,14 +28,13 @@ impl Runner {
             if !action.is_args_empty() {
                 args = action.get_args();
             }
-            if !Runner::run_command(command.as_str(), args) {
-                Term::error("Action failed to run.");
-                return false;
-            }
+            return Runner::run_command(command.as_str(), args);
+        } else {
+            Ok(())
         }
-        true
     }
-    pub fn run_command(program: &str, args: Vec<String>) -> bool {
+
+    pub fn run_command(program: &str, args: Vec<String>) -> Result<(), RunnerError> {
         let mut cmd = Command::new(program);
         cmd.args(args);
         cmd.stdin(Stdio::inherit());
@@ -37,23 +44,23 @@ impl Runner {
         match cmd.output() {
             Ok(status) => {
                 if status.status.success() {
-                    true
+                    Ok(())
                 } else if status.status.code().unwrap() != 0 {
                     Term::error("Program finished with bad exit code.");
-                    return false;
+                    let status_code = status.status.code().unwrap().to_string();
+                    Err(RunnerError::BadExitCode(status_code))
                 } else {
                     Term::error("Program finished with good exit code, but failed.");
-                    return false;
+                    Err(RunnerError::DoneButFailed)
                 }
             }
             Err(error) => {
                 match error.kind() {
-                    ErrorKind::NotFound => Term::error(format!("Cannot found required program: {}.", program).as_str()),
-                    ErrorKind::Interrupted => Term::error("Program was interrupted while running."),
-                    ErrorKind::Other => Term::error("Program exited with unknown reason."),
-                    _ => Term::error("Program exited with unknown reason."),
-                };
-                false
+                    ErrorKind::NotFound => Err(RunnerError::ProgramNotFound(String::from(program))),
+                    ErrorKind::Interrupted => Err(RunnerError::Interrupted),
+                    ErrorKind::Other => Err(RunnerError::Unknown),
+                    _ => Err(RunnerError::Unknown),
+                }
             }
         }
     }

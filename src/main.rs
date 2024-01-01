@@ -41,10 +41,26 @@ fn main() {
             }
 
             for job in project.get_jobs() {
-                for action in job.1 {
-                    if !Runner::run_action(action) {
-                        Term::error(format!("Job `{}` failed to run. Exiting...", job.0).as_str());
-                        exit(1);
+                for action in job.1.iter().enumerate() {
+                    // if !Runner::run_action(action) {
+                    //     Term::error(format!("Job `{}` failed to run. Exiting...", job.0).as_str());
+                    //     exit(1);
+                    // }
+                    match Runner::run_action(action.1.clone()) {
+                        Ok(_) => {},
+                        Err(e) => {
+                            let action_num = action.0 + 1;
+                            let job_name = job.0.as_str();
+                            match e {
+                                runner::RunnerError::ProgramNotFound(prog) => Term::traceback(job_name, action_num.to_string().as_str(), format!("Cannot find required program: {prog}").as_str()),
+                                runner::RunnerError::Interrupted => Term::traceback(job_name, action_num.to_string().as_str(), format!("Program was interrupted").as_str()),
+                                runner::RunnerError::BadExitCode(code) => Term::traceback(job_name, action_num.to_string().as_str(), format!("Program exited with bad exit code: {code}").as_str()),
+                                runner::RunnerError::DoneButFailed => Term::traceback(job_name, action_num.to_string().as_str(), format!("Program exited successfully, but failed.").as_str()),
+                                runner::RunnerError::Unknown => Term::traceback(job_name, action_num.to_string().as_str(), format!("Program exited with unknown reason.").as_str()),
+                            };
+                            Term::error("Tesuto finished his work with errors.");
+                            exit(1)
+                        }
                     }
                 }
             }
@@ -71,10 +87,10 @@ fn main() {
                 let jobs = project.get_jobs();
                 let job_item = jobs.get(job).unwrap();
                 for action in job_item {
-                    if !Runner::run_action(action.clone()) {
-                        Term::error(format!("Job `{}` failed to run. Exiting...", job).as_str());
-                        exit(1);
-                    }
+                    // if !Runner::run_action(action.clone()) {
+                    //     Term::error(format!("Job `{}` failed to run. Exiting...", job).as_str());
+                    //     exit(1);
+                    // }
                 }
                 Term::done("Tesuto finished his work.");
             }
