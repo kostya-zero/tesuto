@@ -83,10 +83,6 @@ fn main() {
                 let jobs = project.get_jobs();
                 let job_item = jobs.get(job).unwrap();
                 for action in job_item.iter().enumerate() {
-                    // if !Runner::run_action(action.clone()) {
-                    //     Term::error(format!("Job `{}` failed to run. Exiting...", job).as_str());
-                    //     exit(1);
-                    // }
                     match Runner::run_action(action.1.clone()) {
                         Ok(_) => {},
                         Err(e) => {
