@@ -6,12 +6,30 @@ use manager::Manager;
 use project::Project;
 use runner::Runner;
 use term::Term;
+use crate::project::Action;
 
 mod args;
 mod manager;
 mod project;
 mod runner;
 mod term;
+
+fn serve_action(action: Action, action_num: usize, job_name: &str) {
+    match Runner::run_action(action) {
+        Ok(_) => {},
+        Err(e) => {
+            match e {
+                runner::RunnerError::ProgramNotFound(prog) => Term::traceback(job_name, action_num.to_string().as_str(), format!("Cannot find required program: {prog}").as_str()),
+                runner::RunnerError::Interrupted => Term::traceback(job_name, action_num.to_string().as_str(), "Program was interrupted"),
+                runner::RunnerError::BadExitCode(code) => Term::traceback(job_name, action_num.to_string().as_str(), format!("Program exited with bad exit code: {code}").as_str()),
+                runner::RunnerError::DoneButFailed => Term::traceback(job_name, action_num.to_string().as_str(), "Program exited successfully, but failed."),
+                runner::RunnerError::Unknown => Term::traceback(job_name, action_num.to_string().as_str(), "Program exited with unknown reason."),
+            };
+            Term::error("Tesuto finished his work with errors.");
+            exit(1)
+        }
+    }
+}
 
 fn main() {
     let args: ArgMatches = args().get_matches();
@@ -42,22 +60,9 @@ fn main() {
 
             for job in project.get_jobs() {
                 for action in job.1.iter().enumerate() {
-                    match Runner::run_action(action.1.clone()) {
-                        Ok(_) => {},
-                        Err(e) => {
-                            let action_num = action.0 + 1;
-                            let job_name = job.0.as_str();
-                            match e {
-                                runner::RunnerError::ProgramNotFound(prog) => Term::traceback(job_name, action_num.to_string().as_str(), format!("Cannot find required program: {prog}").as_str()),
-                                runner::RunnerError::Interrupted => Term::traceback(job_name, action_num.to_string().as_str(), "Program was interrupted"),
-                                runner::RunnerError::BadExitCode(code) => Term::traceback(job_name, action_num.to_string().as_str(), format!("Program exited with bad exit code: {code}").as_str()),
-                                runner::RunnerError::DoneButFailed => Term::traceback(job_name, action_num.to_string().as_str(), "Program exited successfully, but failed."),
-                                runner::RunnerError::Unknown => Term::traceback(job_name, action_num.to_string().as_str(), "Program exited with unknown reason."),
-                            };
-                            Term::error("Tesuto finished his work with errors.");
-                            exit(1)
-                        }
-                    }
+                    let action_num = action.0 + 1;
+                    let job_name = job.0.as_str();
+                    serve_action(action.1.clone(), action_num, job_name);
                 }
             }
             Term::done("Tesuto finished his work.");
@@ -83,21 +88,8 @@ fn main() {
                 let jobs = project.get_jobs();
                 let job_item = jobs.get(job).unwrap();
                 for action in job_item.iter().enumerate() {
-                    match Runner::run_action(action.1.clone()) {
-                        Ok(_) => {},
-                        Err(e) => {
-                            let action_num = action.0 + 1;
-                            match e {
-                                runner::RunnerError::ProgramNotFound(prog) => Term::traceback(job, action_num.to_string().as_str(), format!("Cannot find required program: {prog}").as_str()),
-                                runner::RunnerError::Interrupted => Term::traceback(job, action_num.to_string().as_str(), "Program was interrupted"),
-                                runner::RunnerError::BadExitCode(code) => Term::traceback(job, action_num.to_string().as_str(), format!("Program exited with bad exit code: {code}").as_str()),
-                                runner::RunnerError::DoneButFailed => Term::traceback(job, action_num.to_string().as_str(), "Program exited successfully, but failed."),
-                                runner::RunnerError::Unknown => Term::traceback(job, action_num.to_string().as_str(), "Program exited with unknown reason."),
-                            };
-                            Term::error("Tesuto finished his work with errors.");
-                            exit(1)
-                        }
-                    }
+                    let action_num = action.0 + 1;
+                    serve_action(action.1.clone(), action_num, job);
                 }
                 Term::done("Tesuto finished his work.");
             }
