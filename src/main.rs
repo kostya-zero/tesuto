@@ -14,7 +14,7 @@ mod project;
 mod runner;
 mod term;
 
-fn serve_action(action: Action, action_num: usize, job_name: &str) {
+fn handle_action(action: Action, action_num: usize, job_name: &str) {
     match Runner::run_action(action) {
         Ok(_) => {},
         Err(e) => {
@@ -62,7 +62,7 @@ fn main() {
                 for action in job.1.iter().enumerate() {
                     let action_num = action.0 + 1;
                     let job_name = job.0.as_str();
-                    serve_action(action.1.clone(), action_num, job_name);
+                    handle_action(action.1.clone(), action_num, job_name);
                 }
             }
             Term::done("Tesuto finished his work.");
@@ -89,7 +89,7 @@ fn main() {
                 let job_item = jobs.get(job).unwrap();
                 for action in job_item.iter().enumerate() {
                     let action_num = action.0 + 1;
-                    serve_action(action.1.clone(), action_num, job);
+                    handle_action(action.1.clone(), action_num, job);
                 }
                 Term::done("Tesuto finished his work.");
             }

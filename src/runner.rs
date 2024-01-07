@@ -46,11 +46,9 @@ impl Runner {
                 if status.status.success() {
                     Ok(())
                 } else if status.status.code().unwrap() != 0 {
-                    Term::error("Program finished with bad exit code.");
                     let status_code = status.status.code().unwrap().to_string();
                     Err(RunnerError::BadExitCode(status_code))
                 } else {
-                    Term::error("Program finished with good exit code, but failed.");
                     Err(RunnerError::DoneButFailed)
                 }
             }
