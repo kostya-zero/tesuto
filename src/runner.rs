@@ -1,7 +1,7 @@
+use crate::project::Action;
 use crate::term::Term;
 use std::io::ErrorKind;
 use std::process::{Command, Stdio};
-use crate::project::Action;
 
 pub enum RunnerError {
     ProgramNotFound(String),
@@ -52,14 +52,12 @@ impl Runner {
                     Err(RunnerError::DoneButFailed)
                 }
             }
-            Err(error) => {
-                match error.kind() {
-                    ErrorKind::NotFound => Err(RunnerError::ProgramNotFound(String::from(program))),
-                    ErrorKind::Interrupted => Err(RunnerError::Interrupted),
-                    ErrorKind::Other => Err(RunnerError::Unknown),
-                    _ => Err(RunnerError::Unknown),
-                }
-            }
+            Err(error) => match error.kind() {
+                ErrorKind::NotFound => Err(RunnerError::ProgramNotFound(String::from(program))),
+                ErrorKind::Interrupted => Err(RunnerError::Interrupted),
+                ErrorKind::Other => Err(RunnerError::Unknown),
+                _ => Err(RunnerError::Unknown),
+            },
         }
     }
 }

@@ -1,12 +1,12 @@
 use std::{path::Path, process::exit};
 
+use crate::project::Action;
 use args::args;
 use clap::ArgMatches;
 use manager::Manager;
 use project::Project;
 use runner::Runner;
 use term::Term;
-use crate::project::Action;
 
 mod args;
 mod manager;
@@ -16,14 +16,34 @@ mod term;
 
 fn handle_action(action: Action, action_num: usize, job_name: &str) {
     match Runner::run_action(action) {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(e) => {
             match e {
-                runner::RunnerError::ProgramNotFound(prog) => Term::traceback(job_name, action_num.to_string().as_str(), format!("Cannot find required program: {prog}").as_str()),
-                runner::RunnerError::Interrupted => Term::traceback(job_name, action_num.to_string().as_str(), "Program was interrupted"),
-                runner::RunnerError::BadExitCode(code) => Term::traceback(job_name, action_num.to_string().as_str(), format!("Program exited with bad exit code: {code}").as_str()),
-                runner::RunnerError::DoneButFailed => Term::traceback(job_name, action_num.to_string().as_str(), "Program exited successfully, but failed."),
-                runner::RunnerError::Unknown => Term::traceback(job_name, action_num.to_string().as_str(), "Program exited with unknown reason."),
+                runner::RunnerError::ProgramNotFound(prog) => Term::traceback(
+                    job_name,
+                    action_num.to_string().as_str(),
+                    format!("Cannot find required program: {prog}").as_str(),
+                ),
+                runner::RunnerError::Interrupted => Term::traceback(
+                    job_name,
+                    action_num.to_string().as_str(),
+                    "Program was interrupted",
+                ),
+                runner::RunnerError::BadExitCode(code) => Term::traceback(
+                    job_name,
+                    action_num.to_string().as_str(),
+                    format!("Program exited with bad exit code: {code}").as_str(),
+                ),
+                runner::RunnerError::DoneButFailed => Term::traceback(
+                    job_name,
+                    action_num.to_string().as_str(),
+                    "Program exited successfully, but failed.",
+                ),
+                runner::RunnerError::Unknown => Term::traceback(
+                    job_name,
+                    action_num.to_string().as_str(),
+                    "Program exited with unknown reason.",
+                ),
             };
             Term::error("Tesuto finished his work with errors.");
             exit(1)
@@ -93,7 +113,7 @@ fn main() {
                 }
                 Term::done("Tesuto finished his work.");
             }
-        },
+        }
         Some(("list", _sub)) => {
             if !Path::new("tesuto.yml").exists() {
                 Term::error("Project file not found.");

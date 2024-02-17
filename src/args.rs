@@ -10,14 +10,16 @@ pub fn args() -> Command {
         .subcommands([
             Command::new("new").about("Create new project."),
             Command::new("run").about("Run project configuration."),
-            Command::new("run-job").about("Run specific job in project.").arg(
-                Arg::new("job")
-                    .help("Name of the job to run.")
-                    .num_args(1)
-                    .required(false)
-                    .value_parser(clap::value_parser!(String))
-                    .default_value("")
-            ),
+            Command::new("run-job")
+                .about("Run specific job in project.")
+                .arg(
+                    Arg::new("job")
+                        .help("Name of the job to run.")
+                        .num_args(1)
+                        .required(false)
+                        .value_parser(clap::value_parser!(String))
+                        .default_value(""),
+                ),
             Command::new("list").about("List all stages in project."),
         ])
 }
