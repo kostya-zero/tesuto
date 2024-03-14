@@ -15,9 +15,9 @@ pub struct Runner;
 impl Runner {
     pub fn run_action(action: Action) -> Result<(), RunnerError> {
         if !action.is_name_empty() {
-            Term::message(action.get_name().as_str());
+            Term::work_margin(action.get_name().as_str());
         } else if !action.is_program_empty() {
-            Term::message(format!("Running `{}`", action.get_program()).as_str());
+            Term::work_margin(format!("Running `{}`...", action.get_program()).as_str());
         } else {
             return Ok(());
         }

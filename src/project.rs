@@ -1,6 +1,5 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Action {
@@ -41,9 +40,10 @@ impl Action {
 }
 
 #[derive(Deserialize, Serialize, Clone)]
+#[serde(default)]
 pub struct Project {
-    name: Option<String>,
-    jobs: Option<BTreeMap<String, Vec<Action>>>,
+    name: String,
+    jobs: BTreeMap<String, Vec<Action>>,
 }
 
 impl Default for Project {
@@ -58,29 +58,26 @@ impl Default for Project {
             }],
         );
         Self {
-            name: Some(String::from("TesutoProject")),
-            jobs: Some(new_btree),
+            name: String::from("TesutoProject"),
+            jobs: new_btree,
         }
     }
 }
 
 impl Project {
     pub fn get_name(&self) -> String {
-        let name = self.name.clone();
-        name.unwrap_or_default()
+        self.name.clone()
     }
 
     pub fn get_jobs(&self) -> BTreeMap<String, Vec<Action>> {
-        let jobs = self.jobs.clone();
-        jobs.unwrap_or_default()
+        self.jobs.clone()
     }
 
     pub fn is_jobs_empty(&self) -> bool {
-        self.jobs.is_none() || self.jobs.as_ref().unwrap().is_empty()
+        self.jobs.is_empty()
     }
 
     pub fn is_job_exists(&self, job_name: &str) -> bool {
-        let jobs = self.jobs.clone();
-        jobs.unwrap().contains_key(job_name)
+        self.jobs.contains_key(job_name)
     }
 }

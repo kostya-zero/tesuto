@@ -1,4 +1,4 @@
-use std::{path::Path, process::exit};
+use std::{fs, path::Path, process::exit};
 
 use crate::project::Action;
 use args::args;
@@ -14,40 +14,52 @@ mod project;
 mod runner;
 mod term;
 
-fn handle_action(action: Action, action_num: usize, job_name: &str) {
+fn handle_action(action: Action, job_name: &str) {
     match Runner::run_action(action) {
         Ok(_) => {}
         Err(e) => {
             match e {
                 runner::RunnerError::ProgramNotFound(prog) => Term::traceback(
                     job_name,
-                    action_num.to_string().as_str(),
                     format!("Cannot find required program: {prog}").as_str(),
                 ),
-                runner::RunnerError::Interrupted => Term::traceback(
-                    job_name,
-                    action_num.to_string().as_str(),
-                    "Program was interrupted",
-                ),
+                runner::RunnerError::Interrupted => {
+                    Term::traceback(job_name, "Program was interrupted")
+                }
                 runner::RunnerError::BadExitCode(code) => Term::traceback(
                     job_name,
-                    action_num.to_string().as_str(),
                     format!("Program exited with bad exit code: {code}").as_str(),
                 ),
-                runner::RunnerError::DoneButFailed => Term::traceback(
-                    job_name,
-                    action_num.to_string().as_str(),
-                    "Program exited successfully, but failed.",
-                ),
-                runner::RunnerError::Unknown => Term::traceback(
-                    job_name,
-                    action_num.to_string().as_str(),
-                    "Program exited with unknown reason.",
-                ),
+                runner::RunnerError::DoneButFailed => {
+                    Term::traceback(job_name, "Program exited successfully, but failed.")
+                }
+                runner::RunnerError::Unknown => {
+                    Term::traceback(job_name, "Program exited with unknown reason.")
+                }
             };
             Term::error("Tesuto finished his work with errors.");
             exit(1)
         }
+    }
+}
+
+fn load_project() -> Option<Project> {
+    match Manager::load_project() {
+        Ok(i) => Some(i),
+        Err(e) => match e {
+            manager::ManagerError::ReadError => {
+                Term::fail("Failed to read configuration file.");
+                None
+            }
+            manager::ManagerError::BadStructure => {
+                Term::fail("Configuration file is bad structured.");
+                None
+            }
+            _ => {
+                Term::fail("Unexpected error occured.");
+                None
+            }
+        },
     }
 }
 
@@ -61,8 +73,22 @@ fn main() {
             }
 
             let new_project: Project = Project::default();
-            Manager::write_project(new_project);
-            Term::done("Project created. It's saved as `tesuto.yml`.");
+            match serde_yaml::to_string(&new_project) {
+                Ok(project_string) => match fs::write("tesuto.yml", project_string) {
+                    Ok(_) => Term::done("Project created. It's saved as `tesuto.yml`."),
+                    Err(_) => Term::fail("Failed to write file to "),
+                },
+                Err(_) => Term::fail("Failed to convert structure to string."),
+            }
+        }
+        Some(("check", _sub)) => {
+            if !Path::new("tesuto.yml").exists() {
+                Term::error("Project file not found.");
+                exit(1);
+            }
+
+            Term::work("Trying to load confgiuration...");
+            let project = load_project().unwrap();
         }
         Some(("run", _sub)) => {
             if !Path::new("tesuto.yml").exists() {
@@ -70,7 +96,7 @@ fn main() {
                 exit(1);
             }
 
-            let project = Manager::load_project();
+            let project = load_project().unwrap();
             Term::message(format!("Running project: {}", project.get_name()).as_str());
 
             if project.is_jobs_empty() {
@@ -79,10 +105,10 @@ fn main() {
             }
 
             for job in project.get_jobs() {
-                for action in job.1.iter().enumerate() {
-                    let action_num = action.0 + 1;
+                Term::work(format!("Working on the job {}...", job.0).as_str());
+                for action in job.1.iter() {
                     let job_name = job.0.as_str();
-                    handle_action(action.1.clone(), action_num, job_name);
+                    handle_action(action.clone(), job_name);
                 }
             }
             Term::done("Tesuto finished his work.");
@@ -99,7 +125,7 @@ fn main() {
                     exit(1);
                 }
 
-                let project = Manager::load_project();
+                let project = load_project().unwrap();
                 if !project.is_job_exists(job) {
                     Term::error("Job not found.");
                     exit(1);
@@ -107,9 +133,9 @@ fn main() {
 
                 let jobs = project.get_jobs();
                 let job_item = jobs.get(job).unwrap();
+                Term::work(format!("Working on the job {}...", job).as_str());
                 for action in job_item.iter().enumerate() {
-                    let action_num = action.0 + 1;
-                    handle_action(action.1.clone(), action_num, job);
+                    handle_action(action.1.clone(), job);
                 }
                 Term::done("Tesuto finished his work.");
             }
@@ -120,7 +146,7 @@ fn main() {
                 exit(1);
             }
 
-            let project = Manager::load_project();
+            let project = load_project().unwrap();
             if project.is_jobs_empty() {
                 Term::warn("This project has no jobs.");
                 exit(0);
