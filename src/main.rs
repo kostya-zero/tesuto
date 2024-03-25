@@ -88,7 +88,10 @@ fn main() {
             }
 
             Term::work("Trying to load confgiuration...");
-            let project = load_project().unwrap();
+            if load_project().is_some() {
+                Term::done("Your project is OK.");
+                exit(0);
+            }
         }
         Some(("run", _sub)) => {
             if !Path::new("tesuto.yml").exists() {
