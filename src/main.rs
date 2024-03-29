@@ -40,6 +40,10 @@ fn handle_action(action: Action, job_name: &str) {
 }
 
 fn load_project() -> Option<Project> {
+    if !Path::new("tesuto.yml").exists() {
+        Term::error("Project file not found.");
+        exit(1);
+    }
     match Manager::load_project() {
         Ok(i) => Some(i),
         Err(e) => match e {
@@ -67,7 +71,6 @@ fn main() {
                 Term::error("Project file already exists.");
                 exit(1);
             }
-
             let new_project: Project = Project::default();
             match serde_yaml::to_string(&new_project) {
                 Ok(project_string) => match fs::write("tesuto.yml", project_string) {
@@ -78,11 +81,6 @@ fn main() {
             }
         }
         Some(("check", _sub)) => {
-            if !Path::new("tesuto.yml").exists() {
-                Term::error("Project file not found.");
-                exit(1);
-            }
-
             Term::work("Trying to load confgiuration...");
             if load_project().is_some() {
                 Term::done("Your project is OK.");
@@ -90,11 +88,6 @@ fn main() {
             }
         }
         Some(("run", _sub)) => {
-            if !Path::new("tesuto.yml").exists() {
-                Term::error("Project file not found.");
-                exit(1);
-            }
-
             let project = load_project().unwrap();
             Term::message(format!("Running project: {}", project.get_name()).as_str());
 
@@ -113,11 +106,6 @@ fn main() {
             Term::done("Tesuto finished his work.");
         }
         Some(("run-job", sub)) => {
-            if !Path::new("tesuto.yml").exists() {
-                Term::error("Project file not found.");
-                exit(1);
-            }
-
             if let Some(job) = sub.get_one::<String>("job") {
                 if job.is_empty() {
                     Term::error("Job not specified.");
@@ -140,11 +128,6 @@ fn main() {
             }
         }
         Some(("list", _sub)) => {
-            if !Path::new("tesuto.yml").exists() {
-                Term::error("Project file not found.");
-                exit(1);
-            }
-
             let project = load_project().unwrap();
             if project.is_jobs_empty() {
                 Term::warn("This project has no jobs.");
