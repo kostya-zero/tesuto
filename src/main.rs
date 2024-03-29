@@ -19,25 +19,21 @@ fn handle_action(action: Action, job_name: &str) {
         Ok(_) => {}
         Err(e) => {
             match e {
-                runner::RunnerError::ProgramNotFound(prog) => Term::traceback(
-                    job_name,
-                    format!("Cannot find required program: {prog}").as_str(),
+                runner::RunnerError::ProgramNotFound(prog) => Term::error(
+                    format!("Tesuto failed to run '{prog}' because it cannot find it.").as_str(),
                 ),
-                runner::RunnerError::Interrupted => {
-                    Term::traceback(job_name, "Program was interrupted")
+                runner::RunnerError::Interrupted => Term::error("Program was interrupted."),
+                runner::RunnerError::BadExitCode(code) => {
+                    Term::error(format!("Program had exited with bad exit code: {code}").as_str())
                 }
-                runner::RunnerError::BadExitCode(code) => Term::traceback(
-                    job_name,
-                    format!("Program exited with bad exit code: {code}").as_str(),
-                ),
                 runner::RunnerError::DoneButFailed => {
-                    Term::traceback(job_name, "Program exited successfully, but failed.")
+                    Term::error("Program exited successfully, but failed.")
                 }
-                runner::RunnerError::Unknown => {
-                    Term::traceback(job_name, "Program exited with unknown reason.")
-                }
+                runner::RunnerError::Unknown => Term::error("Program exited with unknown reason."),
             };
-            Term::error("Tesuto finished his work with errors.");
+            Term::error(
+                format!("Job '{job_name}' failed. Check the logs above. Finishing...").as_str(),
+            );
             exit(1)
         }
     }

@@ -34,11 +34,4 @@ impl Term {
     pub fn done(msg: &str) {
         println!("\x1b[1m\x1b[92m \x1b[0m\x1b[1m {}\x1b[0m", msg);
     }
-
-    pub fn traceback(job_name: &str, reason: &str) {
-        println!(
-            "\x1b[1m\x1b[91m \x1b[0m\x1b[1m Tesuto has catched a fail in job {job_name}.\x1b[0m"
-        );
-        println!("\x1b[1m   Reason: {reason}\x1b[0m");
-    }
 }
