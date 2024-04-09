@@ -7,6 +7,15 @@ pub fn args() -> Command {
         .author("Konstantin Zhigaylo <zero@kostyazero.com>")
         .arg_required_else_help(true)
         .subcommand_required(true)
+        .arg(
+            Arg::new("project")
+                .help("Path to the project file.")
+                .default_value("tesuto.yml")
+                .hide_default_value(true)
+                .value_parser(clap::value_parser!(String))
+                .required(false)
+                .num_args(1),
+        )
         .subcommands([
             Command::new("new").about("Create new project."),
             Command::new("run").about("Run project configuration."),

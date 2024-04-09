@@ -10,8 +10,8 @@ pub enum ManagerError {
 
 pub struct Manager;
 impl Manager {
-    pub fn load_project() -> Result<Project, ManagerError> {
-        match fs::read_to_string("tesuto.yml") {
+    pub fn load_project(path: &str) -> Result<Project, ManagerError> {
+        match fs::read_to_string(path) {
             Ok(project_string) => match serde_yaml::from_str::<Project>(&project_string) {
                 Ok(project) => Ok(project),
                 Err(_) => Err(ManagerError::BadStructure),

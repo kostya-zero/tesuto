@@ -39,12 +39,12 @@ fn handle_action(action: Action, job_name: &str) {
     }
 }
 
-fn load_project() -> Option<Project> {
-    if !Path::new("tesuto.yml").exists() {
+fn load_project(path: &str) -> Option<Project> {
+    if !Path::new(path).exists() {
         Term::error("Project file not found.");
         exit(1);
     }
-    match Manager::load_project() {
+    match Manager::load_project(path) {
         Ok(i) => Some(i),
         Err(e) => match e {
             manager::ManagerError::ReadError => {
@@ -65,15 +65,16 @@ fn load_project() -> Option<Project> {
 
 fn main() {
     let args: ArgMatches = args().get_matches();
+    let project_path = args.get_one::<String>("project").unwrap();
     match args.subcommand() {
         Some(("new", _sub)) => {
-            if Path::new("tesuto.yml").exists() {
+            if Path::new(project_path).exists() {
                 Term::error("Project file already exists.");
                 exit(1);
             }
             let new_project: Project = Project::default();
             match serde_yaml::to_string(&new_project) {
-                Ok(project_string) => match fs::write("tesuto.yml", project_string) {
+                Ok(project_string) => match fs::write(project_path, project_string) {
                     Ok(_) => Term::done("Project created. It's saved as `tesuto.yml`."),
                     Err(_) => Term::fail("Failed to write file to "),
                 },
@@ -82,13 +83,13 @@ fn main() {
         }
         Some(("check", _sub)) => {
             Term::work("Trying to load confgiuration...");
-            if load_project().is_some() {
+            if load_project(project_path).is_some() {
                 Term::done("Your project is OK.");
                 exit(0);
             }
         }
         Some(("run", _sub)) => {
-            let project = load_project().unwrap();
+            let project = load_project(project_path).unwrap();
             Term::message(format!("Running project: {}", project.get_name()).as_str());
 
             if project.is_jobs_empty() {
@@ -112,7 +113,7 @@ fn main() {
                     exit(1);
                 }
 
-                let project = load_project().unwrap();
+                let project = load_project(project_path).unwrap();
                 if !project.is_job_exists(job) {
                     Term::error("Job not found.");
                     exit(1);
@@ -128,7 +129,7 @@ fn main() {
             }
         }
         Some(("list", _sub)) => {
-            let project = load_project().unwrap();
+            let project = load_project(project_path).unwrap();
             if project.is_jobs_empty() {
                 Term::warn("This project has no jobs.");
                 exit(0);
