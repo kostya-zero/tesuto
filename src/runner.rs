@@ -1,4 +1,4 @@
-use crate::project::Action;
+use crate::project::Step;
 use crate::term::Term;
 use std::io::ErrorKind;
 use std::process::{Command, Stdio};
@@ -13,20 +13,20 @@ pub enum RunnerError {
 
 pub struct Runner;
 impl Runner {
-    pub fn run_action(action: Action) -> Result<(), RunnerError> {
-        if !action.is_name_empty() {
-            Term::work_margin(action.get_name().as_str());
-        } else if !action.is_program_empty() {
-            Term::work_margin(format!("Running `{}`...", action.get_program()).as_str());
+    pub fn run_step(step: Step) -> Result<(), RunnerError> {
+        if !step.is_name_empty() {
+            Term::work_margin(step.get_name().as_str());
+        } else if !step.is_program_empty() {
+            Term::work_margin(format!("Running `{}`...", step.get_program()).as_str());
         } else {
             return Ok(());
         }
 
-        if !action.is_program_empty() {
-            let command = action.get_program();
+        if !step.is_program_empty() {
+            let command = step.get_program();
             let mut args: Vec<String> = Vec::new();
-            if !action.is_args_empty() {
-                args = action.get_args();
+            if !step.is_args_empty() {
+                args = step.get_args();
             }
             return Runner::run_command(command.as_str(), args);
         } else {

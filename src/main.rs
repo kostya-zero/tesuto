@@ -1,6 +1,6 @@
 use std::{fs, path::Path, process::exit};
 
-use crate::project::Action;
+use crate::project::Step;
 use args::args;
 use clap::ArgMatches;
 use project::Project;
@@ -12,8 +12,8 @@ mod project;
 mod runner;
 mod term;
 
-fn handle_action(action: Action, job_name: &str) {
-    match Runner::run_action(action) {
+fn handle_step(step: Step, job_name: &str) {
+    match Runner::run_step(step) {
         Ok(_) => {}
         Err(e) => {
             match e {
@@ -92,7 +92,7 @@ fn main() {
                 Term::work(format!("Doing job {}...", job.0).as_str());
                 for action in job.1.iter() {
                     let job_name = job.0.as_str();
-                    handle_action(action.clone(), job_name);
+                    handle_step(action.clone(), job_name);
                 }
             }
             Term::done("Tesuto finished his work.");
@@ -114,7 +114,7 @@ fn main() {
                 let job_item = jobs.get(job).unwrap();
                 Term::work(format!("Working on the job {}...", job).as_str());
                 for action in job_item.iter().enumerate() {
-                    handle_action(action.1.clone(), job);
+                    handle_step(action.1.clone(), job);
                 }
                 Term::done("Tesuto finished his work.");
             }

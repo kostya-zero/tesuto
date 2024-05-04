@@ -4,13 +4,13 @@ use std::collections::BTreeMap;
 
 
 #[derive(Deserialize, Serialize, Clone)]
-pub struct Action {
+pub struct Step {
     name: Option<String>,
     program: Option<String>,
     args: Option<Vec<String>>,
 }
 
-impl Action {
+impl Step {
     pub fn is_name_empty(&self) -> bool {
         if self.name.is_none() || self.name.as_ref().unwrap().is_empty() {
             return true;
@@ -45,7 +45,7 @@ impl Action {
 #[serde(default)]
 pub struct Project {
     name: String,
-    jobs: BTreeMap<String, Vec<Action>>,
+    jobs: BTreeMap<String, Vec<Step>>,
 }
 
 pub enum ProjectError {
@@ -54,10 +54,10 @@ pub enum ProjectError {
 
 impl Default for Project {
     fn default() -> Self {
-        let mut new_btree: BTreeMap<String, Vec<Action>> = BTreeMap::new();
+        let mut new_btree: BTreeMap<String, Vec<Step>> = BTreeMap::new();
         new_btree.insert(
-            "hello-job".to_string(),
-            vec![Action {
+            "hello".to_string(),
+            vec![Step {
                 name: Some("Print 'Hello world!'".to_string()),
                 program: Some("echo".to_string()),
                 args: Some(vec!["Hello world!".to_string()]),
@@ -82,7 +82,7 @@ impl Project {
         self.name.clone()
     }
 
-    pub fn get_jobs(&self) -> BTreeMap<String, Vec<Action>> {
+    pub fn get_jobs(&self) -> BTreeMap<String, Vec<Step>> {
         self.jobs.clone()
     }
 
