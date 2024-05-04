@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+
+
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Action {
     name: Option<String>,
@@ -46,6 +48,10 @@ pub struct Project {
     jobs: BTreeMap<String, Vec<Action>>,
 }
 
+pub enum ProjectError {
+    BadStructure
+}
+
 impl Default for Project {
     fn default() -> Self {
         let mut new_btree: BTreeMap<String, Vec<Action>> = BTreeMap::new();
@@ -65,6 +71,13 @@ impl Default for Project {
 }
 
 impl Project {
+    pub fn from(json_string: &str) -> Result<Self, ProjectError> {
+        match serde_yaml::from_str::<Project>(json_string) {
+            Ok(project) => Ok(project),
+            Err(_) => Err(ProjectError::BadStructure)
+        }
+    }
+
     pub fn get_name(&self) -> String {
         self.name.clone()
     }

@@ -3,13 +3,11 @@ use std::{fs, path::Path, process::exit};
 use crate::project::Action;
 use args::args;
 use clap::ArgMatches;
-use manager::Manager;
 use project::Project;
 use runner::Runner;
 use term::Term;
 
 mod args;
-mod manager;
 mod project;
 mod runner;
 mod term;
@@ -44,22 +42,15 @@ fn load_project(path: &str) -> Option<Project> {
         Term::error("Project file not found.");
         exit(1);
     }
-    match Manager::load_project(path) {
+
+    let json_string: String = fs::read_to_string(path).unwrap();
+
+    match Project::from(json_string.as_str()) {
         Ok(i) => Some(i),
-        Err(e) => match e {
-            manager::ManagerError::ReadError => {
-                Term::fail("Failed to read configuration file.");
-                None
-            }
-            manager::ManagerError::BadStructure => {
-                Term::fail("Configuration file is bad structured.");
-                None
-            }
-            _ => {
-                Term::fail("Unexpected error occured.");
-                None
-            }
-        },
+        Err(_) => {
+            Term::error("Project file has a bad structure.");
+            exit(1);
+        }
     }
 }
 
@@ -82,7 +73,7 @@ fn main() {
             }
         }
         Some(("check", _sub)) => {
-            Term::work("Trying to load confgiuration...");
+            Term::work("Trying to load configuration...");
             if load_project(project_path).is_some() {
                 Term::done("Your project is OK.");
                 exit(0);
@@ -98,7 +89,7 @@ fn main() {
             }
 
             for job in project.get_jobs() {
-                Term::work(format!("Working on the job {}...", job.0).as_str());
+                Term::work(format!("Doing job {}...", job.0).as_str());
                 for action in job.1.iter() {
                     let job_name = job.0.as_str();
                     handle_action(action.clone(), job_name);
