@@ -13,27 +13,30 @@ mod runner;
 mod term;
 
 fn handle_step(step: Step, job_name: &str) {
-    match Runner::run_step(step) {
-        Ok(_) => {}
-        Err(e) => {
-            match e {
-                runner::RunnerError::ProgramNotFound(prog) => Term::error(
+    if let Err(e) = Runner::run_step(step) {
+        match e {
+            runner::RunnerError::ProgramNotFound(prog) => {
+                Term::error(
                     format!("Tesuto failed to run '{prog}' because it cannot find it.").as_str(),
-                ),
-                runner::RunnerError::Interrupted => Term::error("Program was interrupted."),
-                runner::RunnerError::BadExitCode(code) => {
-                    Term::error(format!("Program had exited with bad exit code: {code}").as_str())
-                }
-                runner::RunnerError::DoneButFailed => {
-                    Term::error("Program exited successfully, but failed.")
-                }
-                runner::RunnerError::Unknown => Term::error("Program exited with unknown reason."),
-            };
-            Term::error(
-                format!("Job '{job_name}' failed. Check the logs above. Finishing...").as_str(),
-            );
-            exit(1)
+                );
+            }
+            runner::RunnerError::Interrupted => {
+                Term::error("Program was interrupted.");
+            }
+            runner::RunnerError::BadExitCode(code) => {
+                Term::error(format!("Program had exited with bad exit code: {code}").as_str());
+            }
+            runner::RunnerError::DoneButFailed => {
+                Term::error("Program exited successfully, but failed.");
+            }
+            runner::RunnerError::Unknown => {
+                Term::error("Program exited with unknown reason.");
+            }
         }
+        Term::error(
+            format!("Job '{job_name}' failed. Check the logs above. Finishing...").as_str(),
+        );
+        exit(1);
     }
 }
 
