@@ -34,7 +34,7 @@ fn handle_step(step: Step, job_name: &str) {
             }
         }
         Term::error(
-            format!("Job '{job_name}' failed. Check the logs above. Finishing...").as_str(),
+            format!("Job '{job_name}' failed. Exiting...").as_str(),
         );
         exit(1);
     }
@@ -92,10 +92,10 @@ fn main() {
             }
 
             for job in project.get_jobs() {
-                Term::work(format!("Doing job {}...", job.0).as_str());
+                Term::work(format!("Processing job {}...", job.0).as_str());
                 for action in job.1.iter() {
                     let job_name = job.0.as_str();
-                    handle_step(action.clone(), job_name);
+                    handle_step(action.clone(), job_name)
                 }
             }
             Term::done("Tesuto finished his work.");

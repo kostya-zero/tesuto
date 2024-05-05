@@ -18,6 +18,7 @@ pub fn args() -> Command {
         )
         .subcommands([
             Command::new("new").about("Create new project."),
+            Command::new("check").about("Check if project is OK."),
             Command::new("run").about("Run project configuration."),
             Command::new("run-job")
                 .about("Run specific job in project.")
