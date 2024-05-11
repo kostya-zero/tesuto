@@ -4,7 +4,7 @@ use crate::project::Step;
 use args::args;
 use clap::ArgMatches;
 use project::Project;
-use runner::Runner;
+use runner::{Runner, RunnerError};
 use term::Term;
 
 mod args;
@@ -12,31 +12,25 @@ mod project;
 mod runner;
 mod term;
 
-fn handle_step(step: Step, job_name: &str) {
-    if let Err(e) = Runner::run_step(step) {
-        match e {
-            runner::RunnerError::ProgramNotFound(prog) => {
-                Term::error(
-                    format!("Tesuto failed to run '{prog}' because it cannot find it.").as_str(),
-                );
-            }
-            runner::RunnerError::Interrupted => {
-                Term::error("Program was interrupted.");
-            }
-            runner::RunnerError::BadExitCode(code) => {
-                Term::error(format!("Program had exited with bad exit code: {code}").as_str());
-            }
-            runner::RunnerError::DoneButFailed => {
-                Term::error("Program exited successfully, but failed.");
-            }
-            runner::RunnerError::Unknown => {
-                Term::error("Program exited with unknown reason.");
-            }
+fn handle_error(e: RunnerError) {
+    match e {
+        runner::RunnerError::ProgramNotFound(prog) => {
+            Term::error(
+                format!("Program not found: {prog}").as_str(),
+            );
         }
-        Term::error(
-            format!("Job '{job_name}' failed. Exiting...").as_str(),
-        );
-        exit(1);
+        runner::RunnerError::Interrupted => {
+            Term::error("Program was interrupted.");
+        }
+        runner::RunnerError::BadExitCode(code) => {
+            Term::error(format!("Program had exited with bad exit code: {code}").as_str());
+        }
+        runner::RunnerError::DoneButFailed => {
+            Term::error("Program exited successfully, but failed.");
+        }
+        runner::RunnerError::Unknown => {
+            Term::error("Program exited with unknown reason.");
+        }
     }
 }
 
@@ -91,13 +85,12 @@ fn main() {
                 exit(0);
             }
 
-            for job in project.get_jobs() {
-                Term::work(format!("Processing job {}...", job.0).as_str());
-                for action in job.1.iter() {
-                    let job_name = job.0.as_str();
-                    handle_step(action.clone(), job_name)
-                }
+            let runner = Runner::new(project);
+
+            if let Err(error) = runner.run_project() {
+                handle_error(error)
             }
+
             Term::done("Tesuto finished his work.");
         }
         Some(("run-job", sub)) => {
@@ -115,9 +108,11 @@ fn main() {
 
                 let jobs = project.get_jobs();
                 let job_item = jobs.get(job).unwrap();
-                Term::work(format!("Working on the job {}...", job).as_str());
-                for action in job_item.iter().enumerate() {
-                    handle_step(action.1.clone(), job);
+                Term::work(format!("Job '{}'.", job).as_str());
+                let runner = Runner::new(project);
+
+                if let Err(error) = runner.run_job((job, job_item)) {
+                    handle_error(error)
                 }
                 Term::done("Tesuto finished his work.");
             }

@@ -1,5 +1,6 @@
-use crate::project::Step;
+use crate::project::{Project, Step};
 use crate::term::Term;
+use std::env;
 use std::io::ErrorKind;
 use std::process::{Command, Stdio};
 
@@ -8,35 +9,61 @@ pub enum RunnerError {
     Interrupted,
     BadExitCode(String),
     DoneButFailed,
+    // NothingToDo,
     Unknown,
 }
 
-pub struct Runner;
+pub struct Runner {
+    project: Project
+}
+
 impl Runner {
-    pub fn run_step(step: Step) -> Result<(), RunnerError> {
-        if !step.is_name_empty() {
-            Term::work_margin(step.get_name().as_str());
-        } else if !step.is_program_empty() {
-            Term::work_margin(format!("Running `{}`...", step.get_program()).as_str());
+    pub fn new(new_project: Project) -> Self {
+        Self { project: new_project }
+    }
+
+    pub fn run_project(&self) -> Result<(), RunnerError> {
+        Term::message(format!("Running project '{}'.", self.project.get_name()).as_str());
+
+        // if self.project.is_jobs_empty() {
+        //     return Err(RunnerError::NothingToDo);
+        // }
+
+        self.project.get_jobs().iter().try_for_each(|job| self.run_job(job))
+    }
+
+    pub fn run_job(&self, job: (&String, &Vec<Step>)) -> Result<(), RunnerError> {
+        Term::work(format!("Job '{}'.", job.0).as_str());
+
+        job.1.iter().try_for_each(|step| self.run_step(step))
+    }
+
+    pub fn run_step(&self, step: &Step) -> Result<(), RunnerError> {
+        if !step.is_name_empty() || !step.is_run_empty() {
+            let message = if !step.is_name_empty() {
+                step.get_name()
+            } else {
+                step.get_run()
+            };
+            Term::work_margin(message.as_str());
         } else {
             return Ok(());
         }
 
-        if !step.is_program_empty() {
-            let command = step.get_program();
-            let mut args: Vec<String> = Vec::new();
-            if !step.is_args_empty() {
-                args = step.get_args();
+        #[allow(unused_assignments)]
+        let mut cmd = Command::new("");
+        match env::consts::OS {
+            "windows" => {
+                cmd = Command::new("cmd");
+                cmd.arg("/C");
+            },
+            _ => {
+                cmd = Command::new("sh");
+                cmd.arg("-c");
             }
-            return Runner::run_command(command.as_str(), args);
-        } else {
-            Ok(())
         }
-    }
 
-    pub fn run_command(program: &str, args: Vec<String>) -> Result<(), RunnerError> {
-        let mut cmd = Command::new(program);
-        cmd.args(args);
+        cmd.arg(step.get_run());
         cmd.stdin(Stdio::inherit());
         cmd.stdout(Stdio::inherit());
         cmd.stderr(Stdio::inherit());
@@ -51,13 +78,15 @@ impl Runner {
                 } else {
                     Err(RunnerError::DoneButFailed)
                 }
-            }
+            },
             Err(error) => match error.kind() {
-                ErrorKind::NotFound => Err(RunnerError::ProgramNotFound(String::from(program))),
+                ErrorKind::NotFound => Err(RunnerError::ProgramNotFound(String::from(step.get_run()))),
                 ErrorKind::Interrupted => Err(RunnerError::Interrupted),
                 ErrorKind::Other => Err(RunnerError::Unknown),
                 _ => Err(RunnerError::Unknown),
             },
         }
+        
     }
+
 }

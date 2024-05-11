@@ -1,13 +1,11 @@
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
-
-
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Step {
     name: Option<String>,
-    program: Option<String>,
-    args: Option<Vec<String>>,
+    run: Option<String>,
+    quite: Option<bool>,
 }
 
 impl Step {
@@ -17,14 +15,8 @@ impl Step {
         }
         false
     }
-    pub fn is_program_empty(&self) -> bool {
-        if self.program.is_none() || self.program.as_ref().unwrap().is_empty() {
-            return true;
-        }
-        false
-    }
-    pub fn is_args_empty(&self) -> bool {
-        if self.args.is_none() || self.args.as_ref().unwrap().is_empty() {
+    pub fn is_run_empty(&self) -> bool {
+        if self.run.is_none() || self.run.as_ref().unwrap().is_empty() {
             return true;
         }
         false
@@ -33,11 +25,8 @@ impl Step {
         self.name.as_ref().unwrap().clone()
     }
 
-    pub fn get_program(&self) -> String {
-        self.program.as_ref().unwrap().clone()
-    }
-    pub fn get_args(&self) -> Vec<String> {
-        self.args.as_ref().unwrap().clone()
+    pub fn get_run(&self) -> String {
+        self.run.as_ref().unwrap().clone()
     }
 }
 
@@ -59,8 +48,8 @@ impl Default for Project {
             "hello".to_string(),
             vec![Step {
                 name: Some("Print 'Hello world!'".to_string()),
-                program: Some("echo".to_string()),
-                args: Some(vec!["Hello world!".to_string()]),
+                run: Some(String::from("echo \"Hello World!\"")),
+                quite: None,
             }],
         );
         Self {
