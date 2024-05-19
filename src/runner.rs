@@ -9,7 +9,6 @@ pub enum RunnerError {
     Interrupted,
     BadExitCode(String),
     DoneButFailed,
-    // NothingToDo,
     Unknown,
 }
 
@@ -24,11 +23,6 @@ impl Runner {
 
     pub fn run_project(&self) -> Result<(), RunnerError> {
         Term::message(format!("Running project '{}'.", self.project.get_name()).as_str());
-
-        // if self.project.is_jobs_empty() {
-        //     return Err(RunnerError::NothingToDo);
-        // }
-
         self.project.get_jobs().iter().try_for_each(|job| self.run_job(job))
     }
 
@@ -80,7 +74,7 @@ impl Runner {
                 }
             },
             Err(error) => match error.kind() {
-                ErrorKind::NotFound => Err(RunnerError::ProgramNotFound(String::from(step.get_run()))),
+                ErrorKind::NotFound => Err(RunnerError::ProgramNotFound(step.get_run())),
                 ErrorKind::Interrupted => Err(RunnerError::Interrupted),
                 ErrorKind::Other => Err(RunnerError::Unknown),
                 _ => Err(RunnerError::Unknown),

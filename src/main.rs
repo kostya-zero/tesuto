@@ -1,6 +1,5 @@
 use std::{fs, path::Path, process::exit};
 
-use crate::project::Step;
 use args::args;
 use clap::ArgMatches;
 use project::Project;
@@ -14,21 +13,21 @@ mod term;
 
 fn handle_error(e: RunnerError) {
     match e {
-        runner::RunnerError::ProgramNotFound(prog) => {
+        RunnerError::ProgramNotFound(prog) => {
             Term::error(
                 format!("Program not found: {prog}").as_str(),
             );
         }
-        runner::RunnerError::Interrupted => {
+        RunnerError::Interrupted => {
             Term::error("Program was interrupted.");
         }
-        runner::RunnerError::BadExitCode(code) => {
+        RunnerError::BadExitCode(code) => {
             Term::error(format!("Program had exited with bad exit code: {code}").as_str());
         }
-        runner::RunnerError::DoneButFailed => {
+        RunnerError::DoneButFailed => {
             Term::error("Program exited successfully, but failed.");
         }
-        runner::RunnerError::Unknown => {
+        RunnerError::Unknown => {
             Term::error("Program exited with unknown reason.");
         }
     }
@@ -54,6 +53,7 @@ fn load_project(path: &str) -> Option<Project> {
 fn main() {
     let args: ArgMatches = args().get_matches();
     let project_path = args.get_one::<String>("project").unwrap();
+
     match args.subcommand() {
         Some(("new", _sub)) => {
             if Path::new(project_path).exists() {
