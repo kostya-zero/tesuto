@@ -10,16 +10,10 @@ pub struct Step {
 
 impl Step {
     pub fn is_name_empty(&self) -> bool {
-        if self.name.is_none() || self.name.as_ref().unwrap().is_empty() {
-            return true;
-        }
-        false
+        self.name.is_none() || self.name.as_ref().unwrap().is_empty()
     }
     pub fn is_run_empty(&self) -> bool {
-        if self.run.is_none() || self.run.as_ref().unwrap().is_empty() {
-            return true;
-        }
-        false
+        self.run.is_none() || self.run.as_ref().unwrap().is_empty()
     }
     pub fn get_name(&self) -> String {
         self.name.as_ref().unwrap().clone()
