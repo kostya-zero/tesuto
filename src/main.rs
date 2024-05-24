@@ -5,11 +5,13 @@ use clap::ArgMatches;
 use project::Project;
 use runner::{Runner, RunnerError};
 use term::Term;
+use crate::platform::Platform;
 
 mod args;
 mod project;
 mod runner;
 mod term;
+mod platform;
 
 fn handle_error(e: RunnerError) {
     match e {
@@ -50,6 +52,16 @@ fn load_project(path: &str) -> Option<Project> {
     }
 }
 
+fn handle_require(required: Vec<String>) {
+    if required.is_empty() {
+        for prog in required {
+            if !Platform::is_program_installed(prog.as_str()) {
+                Term::fail(format!("Program '{prog}' is not found.").as_str());
+            }
+        }
+    }
+}
+
 fn main() {
     let args: ArgMatches = args().get_matches();
     let project_path = args.get_one::<String>("project").unwrap();
@@ -85,8 +97,9 @@ fn main() {
                 exit(0);
             }
 
-            let runner = Runner::new(project);
+            handle_require(project.get_require());
 
+            let runner = Runner::new(project);
             if let Err(error) = runner.run_project() {
                 handle_error(error)
             }
@@ -101,6 +114,8 @@ fn main() {
                 }
 
                 let project = load_project(project_path).unwrap();
+
+                handle_require(project.get_require());
                 if !project.is_job_exists(job) {
                     Term::error("Job not found.");
                     exit(1);
@@ -131,3 +146,5 @@ fn main() {
         _ => Term::error("Unknown command."),
     }
 }
+
+
