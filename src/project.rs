@@ -15,6 +15,10 @@ impl Step {
     pub fn is_run_empty(&self) -> bool {
         self.run.is_none() || self.run.as_ref().unwrap().is_empty()
     }
+    
+    pub fn get_quite(&self) -> bool {
+        self.quite.unwrap()
+    }
     pub fn get_name(&self) -> String {
         self.name.as_ref().unwrap().clone()
     }
@@ -28,6 +32,7 @@ impl Step {
 #[serde(default)]
 pub struct Project {
     name: String,
+    require: Option<Vec<String>>,
     jobs: BTreeMap<String, Vec<Step>>,
 }
 
@@ -48,6 +53,7 @@ impl Default for Project {
         );
         Self {
             name: String::from("TesutoProject"),
+            require: None,
             jobs: new_btree,
         }
     }
@@ -67,6 +73,14 @@ impl Project {
 
     pub fn get_jobs(&self) -> BTreeMap<String, Vec<Step>> {
         self.jobs.clone()
+    }
+    
+    pub fn get_require(&self) -> Vec<String> {
+        self.require.clone().unwrap()
+    } 
+    
+    pub fn is_require_empty(&self) -> bool {
+        self.require.is_none() || self.require.as_ref().unwrap().is_empty()
     }
 
     pub fn is_jobs_empty(&self) -> bool {

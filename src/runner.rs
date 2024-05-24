@@ -58,9 +58,11 @@ impl Runner {
         }
 
         cmd.arg(step.get_run());
-        cmd.stdin(Stdio::inherit());
-        cmd.stdout(Stdio::inherit());
-        cmd.stderr(Stdio::inherit());
+        if !step.get_quite() {
+            cmd.stdin(Stdio::inherit());
+            cmd.stdout(Stdio::inherit());
+            cmd.stderr(Stdio::inherit());
+        }
 
         match cmd.output() {
             Ok(status) => {
