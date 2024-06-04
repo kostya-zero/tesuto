@@ -1,33 +1,28 @@
 use std::{fs, path::Path, process::exit};
 
+use crate::platform::Platform;
 use args::args;
 use clap::ArgMatches;
 use project::Project;
 use runner::{Runner, RunnerError};
 use term::Term;
-use crate::platform::Platform;
 
 mod args;
+mod platform;
 mod project;
 mod runner;
 mod term;
-mod platform;
 
 fn handle_error(e: RunnerError) {
     match e {
         RunnerError::ProgramNotFound(prog) => {
-            Term::error(
-                format!("Program not found: {prog}").as_str(),
-            );
+            Term::error(format!("Program not found: {prog}").as_str());
         }
         RunnerError::Interrupted => {
             Term::error("Program was interrupted.");
         }
         RunnerError::BadExitCode(code) => {
             Term::error(format!("Program had exited with bad exit code: {code}").as_str());
-        }
-        RunnerError::DoneButFailed => {
-            Term::error("Program exited successfully, but failed.");
         }
         RunnerError::Unknown => {
             Term::error("Program exited with unknown reason.");
@@ -146,5 +141,3 @@ fn main() {
         _ => Term::error("Unknown command."),
     }
 }
-
-
