@@ -71,7 +71,7 @@ fn main() {
             match serde_yaml::to_string(&new_project) {
                 Ok(project_string) => match fs::write(project_path, project_string) {
                     Ok(_) => Term::done("Project created. It's saved as `tesuto.yml`."),
-                    Err(_) => Term::fail("Failed to write file to "),
+                    Err(_) => Term::fail("Failed to write content to file."),
                 },
                 Err(_) => Term::fail("Failed to convert structure to string."),
             }
