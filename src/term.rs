@@ -20,11 +20,11 @@ impl Term {
     }
 
     pub fn work(msg: &str) {
-        println!("\x1b[1m\x1b[91m 󰦖\x1b[0m\x1b[1m {msg}\x1b[0m");
+        println!("\x1b[1m\x1b[96m 󰦖\x1b[0m\x1b[1m {msg}\x1b[0m");
     }
 
     pub fn work_margin(msg: &str) {
-        println!("\x1b[1m\x1b[91m   󰦖\x1b[0m\x1b[1m {msg}\x1b[0m");
+        println!("\x1b[1m\x1b[96m   󰦖\x1b[0m\x1b[1m {msg}\x1b[0m");
     }
 
     pub fn warn(msg: &str) {
