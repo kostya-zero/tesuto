@@ -1,136 +1,73 @@
-# Tesuto Configuration Guide
-
-This guide will help you to configure your Tesuto project.
-
-#### Navigation
-
-- [Getting started](#getting-started)
-- - [Create new project](#create-new-project)
-- - [Project file](#project-file)
-- [Configure project](#configure-project)
-- - [Add new job](#add-new-job)
-- - [More about actions](#more-about-actions)
-- [Running project](#running-project)
-- - [Run whole project](#run-whole-project)
-- - [Run specific job](#run-specific-job)
-
-## Getting started
-
-#### Create new project
-
-Firstly, you need to initialize new project file for Tesuto.
-
+# Configuration
+How to use Tesuto projects and make automated workflows.
+## Projects
+Tesuto uses projects as configuration. To create an example project, you can run `tesuto new`. Tesuto will generate a new project file and place it in the current directory with the name `tesuto.yml`. As the extension suggests, the file contains YAML-structured data. I've chosen YAML to make Tesuto projects more familiar with GitHub Actions workflows.
+## Initialize new project
+To initialize new project use `new` subcommand to run initialization wizard:
 ```shell
 tesuto new
 ```
-
-#### Project file
-
-After initializing project, you will get `tesuto.yml` in your project directory.
-By default, it has this structure:
-
-```yaml
-name: TesutoProject
-jobs:
-  hello-job:
-    - name: Print 'Hello world!'
-      program: echo
-      args:
-        - Hello world!
-```
-
-The `name` field need to make it easier to recognize for which project this configuration was made.
-
-## Configure project
-
-#### Add new job
-
-With new jobs system in 0.2.0 version you can group all action into jobs.
-To make new job you need to add new entry to `jobs` section.
-Each job contains **list of actions**.
-
-For example, you can left only `name` field and use it as message.
-
-```yaml
-...
-build-job:
-  - name: Building project.
-...
-```
-
-Let's add new job called `new-job` and add action that will display "Hello again".
+The initialization wizard will ask you 2 questions:
+- **How you want to name your project?** This name is used to easily identify which project you are running.
+- **Do you want to use example project?** If you type Y, it will generate an example project. This is recommended for new users to understand the structure of a project.
+## Structure
+As was said before, Tesuto uses YAML syntax for projects. The structure for project is pretty simple (especially if you deal with GitHub Actions workflows):
 
 ```yaml
 name: TesutoProject
+require: []
 jobs:
-  hello-job:
-    - name: Print 'Hello world!'
-      program: echo
-      args:
-        - Hello world!
-  new-job:
-    - program: echo
-      args: 
-        - Hello again
+  hello:
+  - name: Print 'Hello world!'
+    run: echo "Hello World!"
+    quite: false
 ```
-
-
-#### More about actions
-
-Action can contain 3 fields:
-- `name` - Text that will display and tell what this action going to do.
-- `program` - Program that will be executed.
-- `args` - Arguments for the program.
-
-Every field in action is optional.
-For example, you can left only `name` field and use it as message.
-
+In the code block above you can see an example project. If you choose to not generate example project, you will see an empty one like this:
+```yaml
+name: TesutoProject
+require: []
+jobs: {}
+```
+In the root of project there is 3 fields:
+- `name` - Used to identify project.
+- `require` - List of programs that required to run this project.
+- `jobs` - Actions that Tesuto need to do.
+We will skip `name` field because it's obvious what it is purpose.
+## Required Programs
+In the `require` field you can specify which programs are required to run this project:
 ```yaml
 ...
-build-job:
-  - name: Building project.
+require:
+	- git
+	- cargo
 ...
 ```
-
-This is an example of how actions in jobs can look like:
-
+It's a list of program that will be found through search in PATH. If one of this programs are not found, Tesuto will crash and tell you which program is not found.
+## Jobs and Steps
+Jobs contain steps that Tesuto needs to perform to complete a job. Every job in a project will be executed step-by-step. The syntax of a job looks like this:
 ```yaml
 ...
-  build-job:
-    - name: Run cargo build.
-      program: cargo
-      args:
-        - build
-        - --release
-        - --target=x86_64-unknown-linux-gnu
-    - name: Make zip package.
-    - program: cp
-      args: 
-        - target/release/app
-        - ./app
-    - program: tar
-      args: 
-        - -cvf
-        - app.tar.gz
-        - ./app
-    - name: Done.
+jobs:
+  cargo:
+  - name: Build release binary
+    run: cargo build --release
+    quite: false
 ...
 ```
-
+Step has 3 properties:
+- `name` - The name of the step. If it's empty, it will be replaced with the command that the step should run.
+- `run` - The command to run. If this field is empty, Tesuto will display only the name of the step. If both name and run fields are empty, Tesuto will skip the step.
+- `quite` - Whether to display the output or not.
+You can create as many jobs and steps as needed. There are no limits for your workflow.
 ## Running project
-
-#### Run whole project
-
-Just run `tesuto` with argument `run` to run project.
-
+You can run your project with ease by using `run` command:
 ```shell
 tesuto run
+
+# If your project is in different location.
+tesuto run --project "configs/tesuto.yml"
 ```
-
-#### Run specific job
-
-To run specific job, use `run-job` argument and sepcify name of job to run.
-
+Also, you can run specific job with `run-job` command:
 ```shell
-tesuto run-job build-job
+tesuto run-job cargo
 ```
