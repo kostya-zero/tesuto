@@ -1,30 +1,31 @@
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Default)]
+#[serde(default)]
 pub struct Step {
-    name: Option<String>,
-    run: Option<String>,
-    quite: Option<bool>,
+    name: String,
+    run: String,
+    quite: bool,
 }
 
 impl Step {
     pub fn is_name_empty(&self) -> bool {
-        self.name.is_none() || self.name.as_ref().unwrap().is_empty()
+        self.name.is_empty()
     }
     pub fn is_run_empty(&self) -> bool {
-        self.run.is_none() || self.run.as_ref().unwrap().is_empty()
+        self.run.is_empty()
     }
 
     pub fn get_quite(&self) -> bool {
-        self.quite.unwrap()
+        self.quite
     }
     pub fn get_name(&self) -> String {
-        self.name.as_ref().unwrap().clone()
+        self.name.clone()
     }
 
     pub fn get_run(&self) -> String {
-        self.run.as_ref().unwrap().clone()
+        self.run.clone()
     }
 }
 
@@ -32,7 +33,7 @@ impl Step {
 #[serde(default)]
 pub struct Project {
     name: String,
-    require: Option<Vec<String>>,
+    require: Vec<String>,
     jobs: BTreeMap<String, Vec<Step>>,
 }
 
@@ -42,24 +43,39 @@ pub enum ProjectError {
 
 impl Default for Project {
     fn default() -> Self {
-        let mut jobs: BTreeMap<String, Vec<Step>> = BTreeMap::new();
-        jobs.insert(
-            "hello".into(),
-            vec![Step {
-                name: Some("Print 'Hello world!'".to_string()),
-                run: Some(String::from("echo \"Hello World!\"")),
-                quite: None,
-            }],
-        );
         Self {
             name: String::from("TesutoProject"),
-            require: None,
-            jobs,
+            require: Vec::new(),
+            jobs: BTreeMap::new(),
         }
     }
 }
 
 impl Project {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: String::from(name),
+            ..Default::default()
+        }
+    }
+
+    pub fn example(name: &str) -> Self {
+        let mut jobs: BTreeMap<String, Vec<Step>> = BTreeMap::new();
+        jobs.insert(
+            "hello".into(),
+            vec![Step {
+                name: "Print 'Hello world!'".to_string(),
+                run: String::from("echo \"Hello World!\""),
+                ..Default::default()
+            }],
+        );
+        Self {
+            name: String::from(name),
+            jobs,
+            ..Default::default()
+        }
+    }
+
     pub fn from(json_string: &str) -> Result<Self, ProjectError> {
         match serde_yaml::from_str::<Project>(json_string) {
             Ok(project) => Ok(project),
@@ -76,7 +92,11 @@ impl Project {
     }
 
     pub fn get_require(&self) -> Vec<String> {
-        self.require.clone().unwrap_or_default()
+        self.require.clone()
+    }
+
+    pub fn is_required_empty(&self) -> bool {
+        self.require.is_empty()
     }
 
     pub fn is_jobs_empty(&self) -> bool {

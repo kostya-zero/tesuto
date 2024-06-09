@@ -1,4 +1,4 @@
-use clap::{Arg, Command};
+use clap::{value_parser, Arg, ArgAction, Command};
 
 pub fn args() -> Command {
     Command::new("tesuto")
@@ -17,7 +17,21 @@ pub fn args() -> Command {
                 .num_args(1),
         )
         .subcommands([
-            Command::new("new").about("Create new project."),
+            Command::new("new").about("Create new project.").args([
+                Arg::new("name")
+                    .help("Name for your project.")
+                    .short('n')
+                    .long("name")
+                    .required(false)
+                    .default_value("")
+                    .value_parser(value_parser!(String)),
+                Arg::new("example")
+                    .help("Use example project.")
+                    .short('e')
+                    .long("example")
+                    .required(false)
+                    .action(ArgAction::SetTrue),
+            ]),
             Command::new("check").about("Check if project is OK."),
             Command::new("run").about("Run project configuration."),
             Command::new("run-job")

@@ -1,10 +1,9 @@
 use std::{fs, path::Path, process::exit};
 
-use crate::platform::Platform;
 use args::args;
 use clap::ArgMatches;
 use project::Project;
-use runner::{Runner, RunnerError};
+use runner::Runner;
 use term::Term;
 
 mod args;
@@ -12,23 +11,6 @@ mod platform;
 mod project;
 mod runner;
 mod term;
-
-fn handle_error(e: RunnerError) {
-    match e {
-        RunnerError::ProgramNotFound(prog) => {
-            Term::error(format!("Program not found: {prog}").as_str());
-        }
-        RunnerError::Interrupted => {
-            Term::error("Program was interrupted.");
-        }
-        RunnerError::BadExitCode(code) => {
-            Term::error(format!("Program had exited with bad exit code: {code}").as_str());
-        }
-        RunnerError::Unknown => {
-            Term::error("Program exited with unknown reason.");
-        }
-    }
-}
 
 fn load_project(path: &str) -> Option<Project> {
     if !Path::new(path).exists() {
@@ -47,27 +29,35 @@ fn load_project(path: &str) -> Option<Project> {
     }
 }
 
-fn handle_require(required: Vec<String>) {
-    if required.is_empty() {
-        for prog in required {
-            if !Platform::is_program_installed(prog.as_str()) {
-                Term::fail(format!("Program '{prog}' is not found.").as_str());
-            }
-        }
-    }
-}
-
 fn main() {
     let args: ArgMatches = args().get_matches();
     let project_path = args.get_one::<String>("project").unwrap();
 
     match args.subcommand() {
-        Some(("new", _sub)) => {
+        Some(("new", sub)) => {
             if Path::new(project_path).exists() {
                 Term::error("Project file already exists.");
                 exit(1);
             }
-            let new_project: Project = Project::default();
+            let project_name: String = sub
+                .get_one::<String>("name")
+                .filter(|name| !name.is_empty())
+                .cloned()
+                .unwrap_or_else(|| {
+                    Term::input("How you want to name your project?", "TesutoProject")
+                });
+
+            let use_example = if sub.get_flag("example") {
+                true
+            } else {
+                Term::ask("Do you want to use example project?", false)
+            };
+
+            let new_project: Project = if use_example {
+                Project::example(project_name.as_str())
+            } else {
+                Project::new(project_name.as_str())
+            };
             match serde_yaml::to_string(&new_project) {
                 Ok(project_string) => match fs::write(project_path, project_string) {
                     Ok(_) => Term::done("Project created. It's saved as `tesuto.yml`."),
@@ -92,11 +82,9 @@ fn main() {
                 exit(0);
             }
 
-            handle_require(project.get_require());
-
             let runner = Runner::new(project);
             if let Err(error) = runner.run_project() {
-                handle_error(error)
+                Term::fail(error.to_string().as_str());
             }
 
             Term::done("Tesuto finished his work.");
@@ -109,8 +97,6 @@ fn main() {
                 }
 
                 let project = load_project(project_path).unwrap();
-
-                handle_require(project.get_require());
                 if !project.is_job_exists(job) {
                     Term::error("Job not found.");
                     exit(1);
@@ -122,7 +108,7 @@ fn main() {
                 let runner = Runner::new(project);
 
                 if let Err(error) = runner.run_job((job, job_item)) {
-                    handle_error(error)
+                    Term::fail(error.to_string().as_str());
                 }
                 Term::done("Tesuto finished his work.");
             }

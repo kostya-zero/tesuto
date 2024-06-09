@@ -1,14 +1,34 @@
+use crate::platform::Platform;
 use crate::project::{Project, Step};
 use crate::term::Term;
-use std::env;
 use std::io::ErrorKind;
 use std::process::{Command, Stdio};
+use std::{env, fmt};
 
 pub enum RunnerError {
     ProgramNotFound(String),
+    RequiredNotFound(String),
     Interrupted,
     BadExitCode(String),
-    Unknown,
+    Unexpected,
+}
+
+impl fmt::Display for RunnerError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            RunnerError::ProgramNotFound(prog) => write!(f, "Program not found: {prog}"),
+            RunnerError::RequiredNotFound(prog) => {
+                write!(f, "The required program is not found: {prog}")
+            }
+            RunnerError::Interrupted => write!(f, "Program was interrupted."),
+            RunnerError::BadExitCode(code) => {
+                write!(f, "Program has exited with a bad exit code: {code}")
+            }
+            RunnerError::Unexpected => {
+                write!(f, "Unexpected error occured and program had exited.")
+            }
+        }
+    }
 }
 
 pub struct Runner {
@@ -24,10 +44,22 @@ impl Runner {
 
     pub fn run_project(&self) -> Result<(), RunnerError> {
         Term::message(format!("Running project '{}'.", self.project.get_name()).as_str());
+        if !self.project.is_required_empty() {
+            self.check_required()?;
+        }
         self.project
             .get_jobs()
             .iter()
             .try_for_each(|job| self.run_job(job))
+    }
+
+    pub fn check_required(&self) -> Result<(), RunnerError> {
+        for prog in self.project.get_require().iter() {
+            if !Platform::is_program_installed(prog.as_str()) {
+                return Err(RunnerError::RequiredNotFound(prog.to_owned()));
+            }
+        }
+        Ok(())
     }
 
     pub fn run_job(&self, job: (&String, &Vec<Step>)) -> Result<(), RunnerError> {
@@ -46,7 +78,7 @@ impl Runner {
         } else {
             step.get_run()
         };
-        Term::work_margin(message.as_str());
+        Term::work_with_margin(message.as_str());
 
         let mut cmd = if env::consts::OS == "windows" {
             let mut command = Command::new("cmd");
@@ -78,7 +110,7 @@ impl Runner {
             Err(error) => match error.kind() {
                 ErrorKind::NotFound => Err(RunnerError::ProgramNotFound(step.get_run())),
                 ErrorKind::Interrupted => Err(RunnerError::Interrupted),
-                _ => Err(RunnerError::Unknown),
+                _ => Err(RunnerError::Unexpected),
             },
         }
     }
