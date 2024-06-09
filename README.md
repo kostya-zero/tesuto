@@ -1,41 +1,89 @@
 # Tesuto
+Tesuto is a minimalist tool that allows you to automate things like builds, deploys etc. It uses YAML syntax for their project to be less harder to understand how to work with it.
 
-<img src="imgs/logo.svg" align="right" width="128px">
-
-Tesuto is a minimalist and lightweight tool for testing.
-Tesuto designed to be easy to set up and be as fast as possible.
-Tesuto allows developers to focus on solving deployment problems.
-
+The main goal of this project is to provide a utility that is fast, lightweight and easy-to-use.
 ## Installation
+You can install Tesuto with `cargo`:
+```shell
+cargo install tesuto
+```
+Also, if you have `cargo-binstall` installed, you can use it too:
+```shell
+cargo binstall tesuto
+```
+If you would like to build Tesuto from source, use this command:
+```shell
+cargo build --release
+```
+## Usage
+To initialize new project use `new` subcommand to run initialization wizard:
+```shell
+tesuto new
+```
+The initialization wizard will ask you 2 questions:
+- **How you want to name your project?** This name is used to easily identify which project you are running.
+- **Do you want to use example project?** If you type Y, it will generate an example project. This is recommended for new users to understand the structure of a project.
 
-#### From releases
+> Refer to [configuration](#configuration) section for how to configure project.
 
-1. Go to the releases section and select the version you want to install.
-2. Download archive and unpack it.
-3. Place executable file to the location that exists in  the `PATH` environment variable.
+You can run your project with ease by using `run` command:
+```shell
+tesuto run
 
-> If you cant run executable with error `permission denied`, run `sudo chmod +x <path_to_tesuto>` to make it possible to run it.
-
-#### From crates.io
-
-1. Download `rustup` and install it by following instructions.
-2. Run `cargo install --locked tesuto` and wait until end of compilation.
-3. Tesuto ready to use.
-
-#### Build from source
-
-1. Download `rustup` and install it by following instructions.
-2. Clone this repository and enter it directory.
-3. Run `git checkout latest` to use sources from latest version or `git checkout main` to use unstable version.
-4. You can run `cargo build` to build executable with debug info or `cargo build --releases` to build version with optimizations.
-
+# If your project is in different location.
+tesuto run --project "configs/tesuto.yml"
+```
+Also, you can run specific job with `run-job` command:
+```shell
+tesuto run-job cargo
+```
 ## Configuration
+### Structure
+Tesuto uses YAML syntax for projects. The structure for project is pretty simple:
 
-Look up in [CONFIGURATION.md](CONFIGURATION.md) file for guides.
-
-## Project layout
+```yaml
+name: TesutoProject
+require: []
+jobs:
+  hello:
+  - name: Print 'Hello world!'
+    run: echo "Hello World!"
+    quite: false
 ```
-├─ imgs/           Images for README.
-├─ target/         Build directory.
-└─ tesuto/         App source code.
+In the code block above you can see an example project. If you choose to not generate example project, you will see an empty one like this:
+```yaml
+name: TesutoProject
+require: []
+jobs: {}
 ```
+In the root of project there is 3 fields:
+- `name` - Used to identify project.
+- `require` - List of programs that required to run this project.
+- `jobs` - Actions that Tesuto need to do.
+We will skip `name` field because it's obvious what it is purpose.
+### Required Programs
+In the `require` field you can specify which programs are required to run this project:
+```yaml
+...
+require:
+  - git
+  - cargo
+...
+```
+It's a list of program that will be found through search in PATH. If one of this programs are not found, Tesuto will crash and tell you which program is not found.
+### Jobs and Steps
+Jobs contain steps that Tesuto needs to perform to complete a job. Every job in a project will be executed step-by-step. The syntax of a job looks like this:
+```yaml
+...
+jobs:
+  cargo:
+  - name: Build release binary
+    run: cargo build --release
+    quite: false
+...
+```
+Step has 3 properties:
+- `name` - The name of the step. If it's empty, it will be replaced with the command that the step should run.
+- `run` - The command to run. If this field is empty, Tesuto will display only the name of the step. If both name and run fields are empty, Tesuto will skip the step.
+- `quite` - Whether to display the output or not.
+You can create as many jobs and steps as needed. There are no limits for your workflow.
