@@ -1,6 +1,6 @@
+use crate::platform::PlatformName::Windows;
 use std::env;
 use std::path::{Path, PathBuf};
-use crate::platform::PlatformName::Windows;
 
 #[derive(PartialEq)]
 pub enum PlatformName {

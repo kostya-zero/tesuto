@@ -1,6 +1,5 @@
-use std::process::exit;
-
 use dialoguer::{theme::ColorfulTheme, Confirm, Input};
+use std::process::exit;
 
 pub struct Term;
 impl Term {
