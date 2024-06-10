@@ -75,7 +75,6 @@ fn main() {
         }
         Some(("run", _sub)) => {
             let project = load_project(project_path).unwrap();
-            Term::message(format!("Running project: {}", project.get_name()).as_str());
 
             if project.is_jobs_empty() {
                 Term::message("Nothing to run.");
