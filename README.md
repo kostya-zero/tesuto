@@ -1,8 +1,11 @@
 # Tesuto
+
 Tesuto is a minimalist tool that allows you to automate things like builds, deploys etc. It uses YAML syntax for their project to be less harder to understand how to work with it.
 
 The main goal of this project is to provide a utility that is fast, lightweight and easy-to-use.
+
 ## Installation
+
 You can install Tesuto with `cargo`:
 ```shell
 cargo install tesuto
@@ -16,6 +19,7 @@ If you would like to build Tesuto from source, use this command:
 cargo build --release
 ```
 ## Usage
+
 To initialize new project use `new` subcommand to run initialization wizard:
 ```shell
 tesuto new
@@ -38,7 +42,9 @@ Also, you can run specific job with `run-job` command:
 tesuto run-job cargo
 ```
 ## Configuration
+
 ### Structure
+
 Tesuto uses YAML syntax for projects. The structure for project is pretty simple:
 
 ```yaml
