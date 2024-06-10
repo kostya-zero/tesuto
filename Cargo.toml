@@ -1,11 +1,12 @@
 [package]
 name = "tesuto"
-description = "Lightweight testing tool."
+description = "Lightweight automation tool."
 authors = ["Konstantin Zhigaylo <zero@kostyazero.com>"]
+keywords = ["automation"]
 readme = "README.md"
 license = "MIT"
-homepage = "https://git.kostyazero.com/kostya-zero/tesuto"
-version = "0.2.0-rc1"
+homepage = "https://github.com/kostya-zero/tesuto"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
