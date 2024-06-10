@@ -1,8 +1,6 @@
 name: Build Binary
 
-on:
-  release:
-    types: [published]
+on: workflow_dispatch
 
 jobs:
   release:
