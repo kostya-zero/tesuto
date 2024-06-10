@@ -6,6 +6,7 @@ keywords = ["automation"]
 readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/kostya-zero/tesuto"
+repository = "https://github.com/kostya-zero/tesuto"
 version = "0.2.0"
 edition = "2021"
 
