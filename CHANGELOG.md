@@ -2,6 +2,10 @@
 
 ## Next
 
+TBD
+
+## v0.2.0
+
 - Now the Tesuto source code is not split into multiple projects, but is located in a single project.
 - Completely changed the structure of the project in Tesuto. More details in this README section.
 - Completely remodeled runner.
