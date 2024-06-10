@@ -1,58 +1,67 @@
 use dialoguer::{theme::ColorfulTheme, Confirm, Input};
 use std::process::exit;
 
+const BOLD: &str = "\x1b[1m";
+const RESET: &str = "\x1b[0m";
+const RED: &str = "\x1b[91m";
+const CYAN: &str = "\x1b[96m";
+const YELLOW: &str = "\x1b[93m";
+const GREEN: &str = "\x1b[92m";
+
 pub struct Term;
 impl Term {
+    fn print_with_icon(icon: &str, color: &str, msg: &str) {
+        println!("{BOLD}{color} {icon}{RESET}{BOLD} {msg}{RESET}");
+    }
+
     pub fn message(msg: &str) {
-        println!("\x1b[1m 󰍡 {msg}\x1b[0m");
+        Self::print_with_icon("󰍡", "", msg);
     }
 
     pub fn input(message: &str, default: &str) -> String {
-        let response = Input::with_theme(&ColorfulTheme::default())
+        Input::with_theme(&ColorfulTheme::default())
             .with_prompt(message)
             .default(default.to_string())
             .show_default(!default.is_empty())
             .interact_text()
-            .unwrap();
-        response
+            .unwrap()
     }
 
     pub fn ask(question: &str, default: bool) -> bool {
-        let response = Confirm::with_theme(&ColorfulTheme::default())
+        Confirm::with_theme(&ColorfulTheme::default())
             .with_prompt(question)
             .default(default)
             .show_default(true)
             .interact()
-            .unwrap();
-        response
+            .unwrap()
     }
 
     pub fn no_icon_message(msg: &str) {
-        println!("\x1b[1m   {msg}\x1b[0m");
+        println!("{BOLD}   {msg}{RESET}");
     }
 
     pub fn error(msg: &str) {
-        println!("\x1b[1m\x1b[91m \x1b[0m\x1b[1m {msg}\x1b[0m");
+        Self::print_with_icon("", RED, msg);
     }
 
     pub fn fail(msg: &str) {
-        println!("\x1b[1m\x1b[91m \x1b[0m\x1b[1m {msg}\x1b[0m");
-        exit(1)
+        Self::error(msg);
+        exit(1);
     }
 
     pub fn work(msg: &str) {
-        println!("\x1b[1m\x1b[96m 󰦖\x1b[0m\x1b[1m {msg}\x1b[0m");
+        Self::print_with_icon("󰦖", CYAN, msg);
     }
 
     pub fn work_with_margin(msg: &str) {
-        println!("\x1b[1m\x1b[96m   󰦖\x1b[0m\x1b[1m {msg}\x1b[0m");
+        println!("{BOLD}{CYAN}   󰦖{RESET}{BOLD} {msg}{RESET}");
     }
 
     pub fn warn(msg: &str) {
-        println!("\x1b[1m\x1b[93m \x1b[0m\x1b[1m {msg}\x1b[0m");
+        Self::print_with_icon("", YELLOW, msg);
     }
 
     pub fn done(msg: &str) {
-        println!("\x1b[1m\x1b[92m \x2b[0m\x1b[1m {msg}\x1b[0m");
+        Self::print_with_icon("", GREEN, msg);
     }
 }
