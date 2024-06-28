@@ -4,9 +4,9 @@ use std::collections::BTreeMap;
 #[derive(Deserialize, Serialize, Clone, Default)]
 #[serde(default)]
 pub struct Step {
-    name: String,
-    run: String,
-    quite: bool,
+    pub name: String,
+    pub run: String,
+    pub quite: bool,
 }
 
 impl Step {
@@ -29,11 +29,24 @@ impl Step {
     }
 }
 
+#[derive(Deserialize, Serialize, Clone, Default)]
+pub struct Shell {
+    pub program: String,
+    pub args: Vec<String>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Default)]
+pub struct WithOptions {
+    pub cwd: Option<String>,
+    pub shell: Option<Shell>,
+}
+
 #[derive(Deserialize, Serialize, Clone)]
 #[serde(default)]
 pub struct Project {
     name: String,
-    require: Vec<String>,
+    require: Option<Vec<String>>,
+    with: Option<WithOptions>,
     jobs: BTreeMap<String, Vec<Step>>,
 }
 
@@ -45,7 +58,8 @@ impl Default for Project {
     fn default() -> Self {
         Self {
             name: String::from("TesutoProject"),
-            require: Vec::new(),
+            require: None,
+            with: None,
             jobs: BTreeMap::new(),
         }
     }
@@ -92,11 +106,15 @@ impl Project {
     }
 
     pub fn get_require(&self) -> Vec<String> {
-        self.require.clone()
+        self.require.clone().unwrap_or_default()
+    }
+
+    pub fn get_with_options(&self) -> WithOptions {
+        self.with.clone().unwrap_or_default()
     }
 
     pub fn is_required_empty(&self) -> bool {
-        self.require.is_empty()
+        self.require.clone().unwrap_or_default().is_empty()
     }
 
     pub fn is_jobs_empty(&self) -> bool {
@@ -105,5 +123,9 @@ impl Project {
 
     pub fn is_job_exists(&self, job_name: &str) -> bool {
         self.jobs.contains_key(job_name)
+    }
+
+    pub fn is_with_empty(&self) -> bool {
+        self.with.is_none()
     }
 }

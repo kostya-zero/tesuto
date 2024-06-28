@@ -296,12 +296,13 @@ dependencies = [
 
 [[package]]
 name = "tesuto"
-version = "0.2.0"
+version = "0.3.0-dev"
 dependencies = [
  "clap",
  "dialoguer",
  "serde",
  "serde_yaml",
+ "thiserror",
 ]
 
 [[package]]

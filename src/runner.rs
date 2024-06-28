@@ -1,34 +1,29 @@
 use crate::platform::Platform;
 use crate::project::{Project, Step};
 use crate::term::Term;
+use std::env;
 use std::io::ErrorKind;
 use std::process::{Command, Stdio};
-use std::{env, fmt};
+use thiserror::Error;
 
+#[derive(Error, Debug)]
 pub enum RunnerError {
+    #[error("Program not found: {0}")]
     ProgramNotFound(String),
+    #[error("The required program is not found: {0}")]
     RequiredNotFound(String),
+    #[error("Program field for custom shell options is empty.")]
+    CustomShellProgramEmpty,
+    #[error("Args field for custom shell options is empty.")]
+    CustomShellArgsEmpty,
+    #[error("Args option for custom shell is incorrect. It should contain item with braces.")]
+    CustomShellArgsIncorrect,
+    #[error("Program was interrupted.")]
     Interrupted,
+    #[error("Progrma has exited with a bad exit code: {0}")]
     BadExitCode(String),
+    #[error("Unexpected error occured and program had exited.")]
     Unexpected,
-}
-
-impl fmt::Display for RunnerError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            RunnerError::ProgramNotFound(prog) => write!(f, "Program not found: {prog}"),
-            RunnerError::RequiredNotFound(prog) => {
-                write!(f, "The required program is not found: {prog}")
-            }
-            RunnerError::Interrupted => write!(f, "Program was interrupted."),
-            RunnerError::BadExitCode(code) => {
-                write!(f, "Program has exited with a bad exit code: {code}")
-            }
-            RunnerError::Unexpected => {
-                write!(f, "Unexpected error occured and program had exited.")
-            }
-        }
-    }
 }
 
 pub struct Runner {
@@ -36,10 +31,8 @@ pub struct Runner {
 }
 
 impl Runner {
-    pub fn new(new_project: Project) -> Self {
-        Self {
-            project: new_project,
-        }
+    pub fn new(project: Project) -> Self {
+        Self { project }
     }
 
     pub fn run_project(&self) -> Result<(), RunnerError> {
@@ -90,7 +83,39 @@ impl Runner {
             command
         };
 
-        cmd.arg(step.get_run());
+        if !self.project.is_with_empty() {
+            let with_options = self.project.get_with_options();
+            if with_options.shell.is_some() {
+                let shell = with_options.shell.unwrap();
+                if shell.program.is_empty() {
+                    return Err(RunnerError::CustomShellProgramEmpty);
+                }
+                cmd = Command::new(shell.program);
+                if shell.args.is_empty() {
+                    return Err(RunnerError::CustomShellArgsEmpty);
+                }
+
+                if !shell.args.iter().any(|i| i == "{}") {
+                    return Err(RunnerError::CustomShellArgsIncorrect);
+                }
+
+                for arg in shell.args {
+                    if arg == "{}" {
+                        cmd.arg(step.get_run());
+                    } else {
+                        cmd.arg(arg);
+                    }
+                }
+            }
+            if with_options.cwd.is_some() {
+                let cwd = with_options.cwd.unwrap();
+                if !cwd.is_empty() {
+                    cmd.current_dir(cwd);
+                }
+            }
+        } else {
+            cmd.arg(step.get_run());
+        }
 
         if !step.get_quite() {
             cmd.stdin(Stdio::inherit());
