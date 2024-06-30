@@ -22,3 +22,4 @@ dialoguer = "0.11.0"
 serde = { version = "1.0.196", features = ["derive"] }
 serde_yaml = "0.9.31"
 thiserror = "1.0.61"
+which = "6.0.1"

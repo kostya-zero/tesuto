@@ -1,4 +1,3 @@
-use crate::platform::Platform;
 use crate::project::{Project, Step};
 use crate::term::Term;
 use std::env;
@@ -48,7 +47,7 @@ impl Runner {
 
     pub fn check_required(&self) -> Result<(), RunnerError> {
         for prog in self.project.get_require().iter() {
-            if !Platform::is_program_installed(prog.as_str()) {
+            if which::which(prog).is_err() {
                 return Err(RunnerError::RequiredNotFound(prog.to_owned()));
             }
         }

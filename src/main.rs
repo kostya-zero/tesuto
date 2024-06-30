@@ -7,7 +7,6 @@ use runner::Runner;
 use term::Term;
 
 mod args;
-mod platform;
 mod project;
 mod runner;
 mod term;
@@ -22,8 +21,8 @@ fn load_project(path: &str) -> Option<Project> {
 
     match Project::from(json_string.as_str()) {
         Ok(i) => Some(i),
-        Err(_) => {
-            Term::error("Project file has a bad structure.");
+        Err(e) => {
+            Term::error(e.to_string().as_str());
             exit(1);
         }
     }
@@ -39,6 +38,7 @@ fn main() {
                 Term::error("Project file already exists.");
                 exit(1);
             }
+
             let project_name: String = sub
                 .get_one::<String>("name")
                 .filter(|name| !name.is_empty())

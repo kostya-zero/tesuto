@@ -1,48 +1,53 @@
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+use thiserror::Error;
 
 #[derive(Deserialize, Serialize, Clone, Default)]
 #[serde(default)]
 pub struct Step {
-    pub name: String,
-    pub run: String,
-    pub quite: bool,
+    pub name: Option<String>,
+    pub run: Option<String>,
+    pub quite: Option<bool>,
 }
 
 impl Step {
     pub fn is_name_empty(&self) -> bool {
-        self.name.is_empty()
+        self.name.clone().unwrap_or_default().is_empty()
     }
+
     pub fn is_run_empty(&self) -> bool {
-        self.run.is_empty()
+        self.run.clone().unwrap_or_default().is_empty()
     }
 
     pub fn get_quite(&self) -> bool {
-        self.quite
+        self.quite.unwrap_or_default()
     }
+
     pub fn get_name(&self) -> String {
-        self.name.clone()
+        self.name.clone().unwrap_or_default()
     }
 
     pub fn get_run(&self) -> String {
-        self.run.clone()
+        self.run.clone().unwrap_or_default()
     }
 }
 
 #[derive(Deserialize, Serialize, Clone, Default)]
+#[serde(deny_unknown_fields)]
 pub struct Shell {
     pub program: String,
     pub args: Vec<String>,
 }
 
 #[derive(Deserialize, Serialize, Clone, Default)]
+#[serde(deny_unknown_fields)]
 pub struct WithOptions {
     pub cwd: Option<String>,
     pub shell: Option<Shell>,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
-#[serde(default)]
+#[serde(deny_unknown_fields)]
 pub struct Project {
     name: String,
     require: Option<Vec<String>>,
@@ -50,8 +55,10 @@ pub struct Project {
     jobs: BTreeMap<String, Vec<Step>>,
 }
 
+#[derive(Debug, Error)]
 pub enum ProjectError {
-    BadStructure,
+    #[error("Failed to deserialize project with error: {0}")]
+    DeserializeFailed(String),
 }
 
 impl Default for Project {
@@ -78,8 +85,8 @@ impl Project {
         jobs.insert(
             "hello".into(),
             vec![Step {
-                name: "Print 'Hello world!'".to_string(),
-                run: String::from("echo \"Hello World!\""),
+                name: Some("Print 'Hello world!'".to_string()),
+                run: Some(String::from("echo \"Hello World!\"")),
                 ..Default::default()
             }],
         );
@@ -93,7 +100,7 @@ impl Project {
     pub fn from(json_string: &str) -> Result<Self, ProjectError> {
         match serde_yaml::from_str::<Project>(json_string) {
             Ok(project) => Ok(project),
-            Err(_) => Err(ProjectError::BadStructure),
+            Err(e) => Err(ProjectError::DeserializeFailed(e.to_string())),
         }
     }
 
