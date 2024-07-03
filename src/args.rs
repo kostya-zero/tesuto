@@ -9,11 +9,14 @@ pub fn args() -> Command {
         .subcommand_required(true)
         .arg(
             Arg::new("project")
+                .long("project")
+                .short('p')
                 .help("Path to the project file.")
                 .default_value("tesuto.yml")
                 .hide_default_value(true)
                 .value_parser(clap::value_parser!(String))
                 .required(false)
+                .global(true)
                 .num_args(1),
         )
         .subcommands([

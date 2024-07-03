@@ -1,5 +1,5 @@
+use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
 use thiserror::Error;
 
 #[derive(Deserialize, Serialize, Clone, Default)]
@@ -49,10 +49,10 @@ pub struct WithOptions {
 #[derive(Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Project {
-    name: String,
+    name: Option<String>,
     require: Option<Vec<String>>,
     with: Option<WithOptions>,
-    jobs: BTreeMap<String, Vec<Step>>,
+    jobs: IndexMap<String, Vec<Step>>,
 }
 
 #[derive(Debug, Error)]
@@ -64,10 +64,10 @@ pub enum ProjectError {
 impl Default for Project {
     fn default() -> Self {
         Self {
-            name: String::from("TesutoProject"),
+            name: Some(String::from("TesutoProject")),
             require: None,
             with: None,
-            jobs: BTreeMap::new(),
+            jobs: IndexMap::new(),
         }
     }
 }
@@ -75,13 +75,13 @@ impl Default for Project {
 impl Project {
     pub fn new(name: &str) -> Self {
         Self {
-            name: String::from(name),
+            name: Some(String::from(name)),
             ..Default::default()
         }
     }
 
     pub fn example(name: &str) -> Self {
-        let mut jobs: BTreeMap<String, Vec<Step>> = BTreeMap::new();
+        let mut jobs: IndexMap<String, Vec<Step>> = IndexMap::new();
         jobs.insert(
             "hello".into(),
             vec![Step {
@@ -91,7 +91,7 @@ impl Project {
             }],
         );
         Self {
-            name: String::from(name),
+            name: Some(String::from(name)),
             jobs,
             ..Default::default()
         }
@@ -105,10 +105,10 @@ impl Project {
     }
 
     pub fn get_name(&self) -> String {
-        self.name.clone()
+        self.name.clone().unwrap_or_default()
     }
 
-    pub fn get_jobs(&self) -> BTreeMap<String, Vec<Step>> {
+    pub fn get_jobs(&self) -> IndexMap<String, Vec<Step>> {
         self.jobs.clone()
     }
 
