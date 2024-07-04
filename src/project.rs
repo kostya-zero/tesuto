@@ -5,9 +5,9 @@ use thiserror::Error;
 #[derive(Deserialize, Serialize, Clone, Default)]
 #[serde(default)]
 pub struct Step {
-    pub name: Option<String>,
-    pub run: Option<String>,
-    pub quite: Option<bool>,
+    name: Option<String>,
+    run: Option<String>,
+    quite: Option<bool>,
 }
 
 impl Step {

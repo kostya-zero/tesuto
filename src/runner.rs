@@ -82,14 +82,16 @@ impl Runner {
             command
         };
 
+        let with_options = self.project.get_with_options();
+
         if !self.project.is_with_empty() {
-            let with_options = self.project.get_with_options();
-            if with_options.shell.is_some() {
-                let shell = with_options.shell.unwrap();
+            if let Some(shell) = with_options.shell {
                 if shell.program.is_empty() {
                     return Err(RunnerError::CustomShellProgramEmpty);
                 }
+
                 cmd = Command::new(shell.program);
+
                 if shell.args.is_empty() {
                     return Err(RunnerError::CustomShellArgsEmpty);
                 }
@@ -99,15 +101,11 @@ impl Runner {
                 }
 
                 for arg in shell.args {
-                    if arg == "{}" {
-                        cmd.arg(step.get_run());
-                    } else {
-                        cmd.arg(arg);
-                    }
+                    cmd.arg(if arg == "{}" { step.get_run() } else { arg });
                 }
             }
-            if with_options.cwd.is_some() {
-                let cwd = with_options.cwd.unwrap();
+
+            if let Some(cwd) = with_options.cwd {
                 if !cwd.is_empty() {
                     cmd.current_dir(cwd);
                 }
