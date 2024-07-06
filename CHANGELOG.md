@@ -6,8 +6,9 @@ TBD
 
 ## v0.3.0
 
-- Added `with` option to the project that allows user to specify custom shell and working directory.
+- Added `with` option to the project that allows user to specify custom shell and working directory. See [README.md#with-option] for more details.
 - Tesuto has finally learned how to load project jobs in the correct order.
+- This project is now licensed under the MIT license.
 
 ## v0.2.0
 
