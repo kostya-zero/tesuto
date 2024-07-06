@@ -49,7 +49,6 @@ Tesuto uses YAML syntax for projects. The structure for project is pretty simple
 
 ```yaml
 name: TesutoProject
-require: []
 jobs:
   hello:
   - name: Print 'Hello world!'
@@ -64,9 +63,27 @@ jobs: {}
 ```
 In the root of project there is 3 fields:
 - `name` - Used to identify project.
+- `with` - Additional options to run your project.
 - `require` - List of programs that required to run this project.
 - `jobs` - Actions that Tesuto need to do.
 We will skip `name` field because it's obvious what it is purpose.
+
+### `with` option
+The `with` field serves as additional options for your project. It has 2 options:
+```yaml
+...
+with:
+  shell:
+    program: "zsh"
+    args:
+      - "-c"
+      - "{}"
+  cwd: "build"
+```
+
+- `shell` - Allows you to specify the shell you want to run. Note that it is important to add curly braces to the args field as in the example above, because Tesuto will replace them with a command to run.
+- `cwd` - Changes the working directory for Tesuto.
+
 ### Required Programs
 In the `require` field you can specify which programs are required to run this project:
 ```yaml

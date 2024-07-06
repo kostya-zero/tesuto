@@ -4,6 +4,11 @@
 
 TBD
 
+## v0.3.0
+
+- Added `with` option to the project that allows user to specify custom shell and working directory.
+- Tesuto has finally learned how to load project jobs in the correct order.
+
 ## v0.2.0
 
 - Now the Tesuto source code is not split into multiple projects, but is located in a single project.
