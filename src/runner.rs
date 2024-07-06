@@ -103,6 +103,8 @@ impl Runner {
                 for arg in shell.args {
                     cmd.arg(if arg == "{}" { step.get_run() } else { arg });
                 }
+            } else {
+                cmd.arg(step.get_run());
             }
 
             if let Some(cwd) = with_options.cwd {
