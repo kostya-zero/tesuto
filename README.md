@@ -1,6 +1,6 @@
 # Tesuto
 
-Tesuto is a minimalist tool that allows you to automate things like builds, deploys etc. It uses YAML syntax for their project to be less harder to understand how to work with it.
+Tesuto is a minimalist tool that allows you to automate things like builds, deploys etc. It uses YAML syntax for their project files to be less harder to understand how to work with it.
 
 The main goal of this project is to provide a utility that is fast, lightweight and easy-to-use.
 
@@ -14,10 +14,7 @@ Also, if you have `cargo-binstall` installed, you can use it too:
 ```shell
 cargo binstall tesuto
 ```
-If you would like to build Tesuto from source, use this command:
-```shell
-cargo build --release
-```
+
 ## Usage
 
 To initialize new project use `new` subcommand to run initialization wizard:
@@ -26,7 +23,7 @@ tesuto new
 ```
 The initialization wizard will ask you 2 questions:
 - **How you want to name your project?** This name is used to easily identify which project you are running.
-- **Do you want to use example project?** If you type Y, it will generate an example project. This is recommended for new users to understand the structure of a project.
+- **Do you want to use example project?** If you type Y, it will generate an example project. This is recommended for new users to understand the structure of a project file.
 
 > Refer to [configuration](#configuration) section for how to configure project.
 
