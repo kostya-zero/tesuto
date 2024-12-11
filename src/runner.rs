@@ -116,7 +116,7 @@ impl Runner {
             cmd.arg(step.get_run());
         }
 
-        if !step.get_quite() {
+        if !step.get_quiet() {
             cmd.stdin(Stdio::inherit());
             cmd.stdout(Stdio::inherit());
             cmd.stderr(Stdio::inherit());

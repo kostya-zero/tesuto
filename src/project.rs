@@ -7,7 +7,7 @@ use thiserror::Error;
 pub struct Step {
     name: Option<String>,
     run: Option<String>,
-    quite: Option<bool>,
+    quiet: Option<bool>,
 }
 
 impl Step {
@@ -19,8 +19,8 @@ impl Step {
         self.run.clone().unwrap_or_default().is_empty()
     }
 
-    pub fn get_quite(&self) -> bool {
-        self.quite.unwrap_or_default()
+    pub fn get_quiet(&self) -> bool {
+        self.quiet.unwrap_or_default()
     }
 
     pub fn get_name(&self) -> String {

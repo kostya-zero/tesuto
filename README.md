@@ -50,7 +50,7 @@ jobs:
   hello:
   - name: Print 'Hello world!'
     run: echo "Hello World!"
-    quite: false
+    quiet: false
 ```
 In the code block above you can see an example project. If you choose to not generate example project, you will see an empty one like this:
 ```yaml
@@ -99,11 +99,11 @@ jobs:
   cargo:
   - name: Build release binary
     run: cargo build --release
-    quite: false
+    quiete: false
 ...
 ```
 Step has 3 properties:
 - `name` - The name of the step. If it's empty, it will be replaced with the command that the step should run.
 - `run` - The command to run. If this field is empty, Tesuto will display only the name of the step. If both name and run fields are empty, Tesuto will skip the step.
-- `quite` - Whether to display the output or not.
+- `quiet` - Whether to display the output or not.
 You can create as many jobs and steps as needed. There are no limits for your workflow.
