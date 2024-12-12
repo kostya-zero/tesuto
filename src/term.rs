@@ -11,7 +11,7 @@ const GREEN: &str = "\x1b[92m";
 pub struct Term;
 impl Term {
     fn print_with_icon(icon: &str, color: &str, msg: &str) {
-        println!("{BOLD}{color} {icon}{RESET}{BOLD} {msg}{RESET}");
+        println!("{BOLD}{color}{icon}{RESET}{BOLD} {msg}{RESET}");
     }
 
     pub fn message(msg: &str) {
@@ -37,7 +37,7 @@ impl Term {
     }
 
     pub fn no_icon_message(msg: &str) {
-        println!("{BOLD}   {msg}{RESET}");
+        println!("{BOLD}  {msg}{RESET}");
     }
 
     pub fn error(msg: &str) {

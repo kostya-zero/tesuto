@@ -86,7 +86,7 @@ fn main() {
                 Term::fail(error.to_string().as_str());
             }
 
-            Term::done("Tesuto finished his work.");
+            Term::done("Project run successfully.");
         }
         Some(("run-job", sub)) => {
             if let Some(job) = sub.get_one::<String>("job") {
@@ -109,7 +109,7 @@ fn main() {
                 if let Err(error) = runner.run_job((job, job_item)) {
                     Term::fail(error.to_string().as_str());
                 }
-                Term::done("Tesuto finished his work.");
+                Term::done("Job run successfully.");
             }
         }
         Some(("list", _sub)) => {
