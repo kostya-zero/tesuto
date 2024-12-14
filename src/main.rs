@@ -21,7 +21,11 @@ fn load_project(path: &str) -> Option<Project> {
 
     match Project::from(json_string.as_str()) {
         Ok(i) => Some(i),
-        Err(_) => None,
+        Err(e) => {
+            Term::error("Looks like your project is broken. The error I got:");
+            Term::message(e.to_string().as_str());
+            exit(1);
+        },
     }
 }
 
@@ -32,7 +36,7 @@ fn main() {
     match args.subcommand() {
         Some(("new", sub)) => {
             if Path::new(project_path).exists() {
-                Term::error("Project file already exists.");
+                Term::warn("Project file already exists.");
                 exit(1);
             }
 
@@ -41,13 +45,13 @@ fn main() {
                 .filter(|name| !name.is_empty())
                 .cloned()
                 .unwrap_or_else(|| {
-                    Term::input("How you want to name your project?", "TesutoProject")
+                    Term::input("The name of your project?", "TesutoProject")
                 });
 
             let use_example = if sub.get_flag("example") {
                 true
             } else {
-                Term::ask("Do you want to use example project?", false)
+                Term::ask("Use example project?", false)
             };
 
             let new_project: Project = if use_example {
@@ -67,8 +71,6 @@ fn main() {
             if load_project(project_path).is_some() {
                 Term::done("Your project is OK.");
                 exit(0);
-            } else {
-                Term::fail("Your project is broken.");
             }
         }
         Some(("run", _sub)) => {

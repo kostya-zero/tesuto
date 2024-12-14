@@ -7,6 +7,7 @@ use thiserror::Error;
 pub struct Step {
     name: Option<String>,
     run: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     quiet: Option<bool>,
 }
 
@@ -50,14 +51,16 @@ pub struct WithOptions {
 #[serde(deny_unknown_fields)]
 pub struct Project {
     name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     require: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     with: Option<WithOptions>,
     jobs: IndexMap<String, Vec<Step>>,
 }
 
 #[derive(Debug, Error)]
 pub enum ProjectError {
-    #[error("Failed to deserialize project with error: {0}")]
+    #[error("{0}")]
     DeserializeFailed(String),
 }
 
