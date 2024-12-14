@@ -21,10 +21,7 @@ fn load_project(path: &str) -> Option<Project> {
 
     match Project::from(json_string.as_str()) {
         Ok(i) => Some(i),
-        Err(e) => {
-            Term::error(e.to_string().as_str());
-            exit(1);
-        }
+        Err(_) => None,
     }
 }
 
@@ -67,14 +64,20 @@ fn main() {
             }
         }
         Some(("check", _sub)) => {
-            Term::work("Trying to load configuration...");
             if load_project(project_path).is_some() {
                 Term::done("Your project is OK.");
                 exit(0);
+            } else {
+                Term::fail("Your project is broken.");
             }
         }
         Some(("run", _sub)) => {
-            let project = load_project(project_path).unwrap();
+            let project = if let Some(project) = load_project(project_path) {
+                project
+            } else {
+                Term::fail("Looks like your project is broken. Cannot run it.");
+                exit(1);
+            };
 
             if project.is_jobs_empty() {
                 Term::message("Nothing to run.");
@@ -118,7 +121,7 @@ fn main() {
                 Term::warn("This project has no jobs.");
                 exit(0);
             }
-            Term::message("Jobs in this project:");
+            Term::message(format!("Jobs in project '{}':", project.get_name()).as_str());
             for job in project.get_jobs() {
                 Term::no_icon_message(job.0.as_str());
             }

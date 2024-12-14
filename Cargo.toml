@@ -2,12 +2,12 @@
 name = "tesuto"
 description = "Lightweight automation tool."
 authors = ["Konstantin Zhigaylo <zero@kostyazero.com>"]
-keywords = ["automation"]
+keywords = ["automation", "tool", "project", "build", "deploy"]
 readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/kostya-zero/tesuto"
 repository = "https://github.com/kostya-zero/tesuto"
-version = "0.3.0"
+version = "0.3.1-dev"
 edition = "2021"
 
 [profile.release]

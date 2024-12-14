@@ -35,7 +35,6 @@ impl Runner {
     }
 
     pub fn run_project(&self) -> Result<(), RunnerError> {
-        Term::message(format!("Running project '{}'.", self.project.get_name()).as_str());
         if !self.project.is_required_empty() {
             self.check_required()?;
         }
@@ -55,7 +54,7 @@ impl Runner {
     }
 
     pub fn run_job(&self, job: (&String, &Vec<Step>)) -> Result<(), RunnerError> {
-        Term::work(format!("Job '{}'.", job.0).as_str());
+        Term::job_name(format!("Job '{}'", job.0).as_str());
 
         job.1.iter().try_for_each(|step| self.run_step(step))
     }
