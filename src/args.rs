@@ -36,17 +36,14 @@ pub fn args() -> Command {
                     .action(ArgAction::SetTrue),
             ]),
             Command::new("check").about("Check if project is OK."),
-            Command::new("run").about("Run project configuration."),
-            Command::new("run-job")
-                .about("Run specific job in project.")
-                .arg(
-                    Arg::new("job")
-                        .help("Name of the job to run.")
-                        .num_args(1)
-                        .required(false)
-                        .value_parser(clap::value_parser!(String))
-                        .default_value(""),
-                ),
+            Command::new("run").about("Run project configuration.").arg(
+                Arg::new("job")
+                    .required(false)
+                    .help("Name of the job to run.")
+                    .short('j')
+                    .long("job")
+                    .value_parser(value_parser!(String)),
+            ),
             Command::new("list").about("List all stages in project."),
         ])
 }

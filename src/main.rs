@@ -25,7 +25,7 @@ fn load_project(path: &str) -> Option<Project> {
             Term::error("Looks like your project is broken. The error I got:");
             Term::message(e.to_string().as_str());
             exit(1);
-        },
+        }
     }
 }
 
@@ -44,9 +44,7 @@ fn main() {
                 .get_one::<String>("name")
                 .filter(|name| !name.is_empty())
                 .cloned()
-                .unwrap_or_else(|| {
-                    Term::input("The name of your project?", "TesutoProject")
-                });
+                .unwrap_or_else(|| Term::input("The name of your project?", "TesutoProject"));
 
             let use_example = if sub.get_flag("example") {
                 true
@@ -73,7 +71,7 @@ fn main() {
                 exit(0);
             }
         }
-        Some(("run", _sub)) => {
+        Some(("run", sub)) => {
             let project = if let Some(project) = load_project(project_path) {
                 project
             } else {
@@ -86,21 +84,14 @@ fn main() {
                 exit(0);
             }
 
-            let runner = Runner::new(project);
-            if let Err(error) = runner.run_project() {
-                Term::fail(error.to_string().as_str());
-            }
+            let runner = Runner::new(project.clone());
 
-            Term::done("Project run successfully.");
-        }
-        Some(("run-job", sub)) => {
             if let Some(job) = sub.get_one::<String>("job") {
                 if job.is_empty() {
                     Term::error("Job not specified.");
                     exit(1);
                 }
 
-                let project = load_project(project_path).unwrap();
                 if !project.is_job_exists(job) {
                     Term::error("Job not found.");
                     exit(1);
@@ -108,14 +99,19 @@ fn main() {
 
                 let jobs = project.get_jobs();
                 let job_item = jobs.get(job).unwrap();
-                Term::work(format!("Job '{}'.", job).as_str());
-                let runner = Runner::new(project);
 
                 if let Err(error) = runner.run_job((job, job_item)) {
                     Term::fail(error.to_string().as_str());
                 }
                 Term::done("Job run successfully.");
+                exit(0);
             }
+
+            if let Err(error) = runner.run_project() {
+                Term::fail(error.to_string().as_str());
+            }
+
+            Term::done("Project run successfully.");
         }
         Some(("list", _sub)) => {
             let project = load_project(project_path).unwrap();
