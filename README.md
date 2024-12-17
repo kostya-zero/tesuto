@@ -7,37 +7,42 @@ The main goal of this project is to provide a utility that is fast, lightweight 
 ## Installation
 
 You can install Tesuto with `cargo`:
+
 ```shell
 cargo install tesuto
 ```
+
 Also, if you have `cargo-binstall` installed, you can use it too:
+
 ```shell
 cargo binstall tesuto
 ```
 
 ## Usage
 
-To initialize new project use `new` subcommand to run initialization wizard:
+To generate an example project, you can use `generate` command:
+
 ```shell
-tesuto new
+tesuto generate
 ```
-The initialization wizard will ask you 2 questions:
-- **How you want to name your project?** This name is used to easily identify which project you are running.
-- **Do you want to use example project?** If you type Y, it will generate an example project. This is recommended for new users to understand the structure of a project file.
 
 > Refer to [configuration](#configuration) section for how to configure project.
 
 You can run your project with ease by using `run` command:
+
 ```shell
 tesuto run
 
 # If your project is in different location.
 tesuto run --project "configs/tesuto.yml"
 ```
+
 Also, you can run specific job with `run-job` command:
+
 ```shell
 tesuto run-job cargo
 ```
+
 ## Configuration
 
 ### Structure
@@ -59,6 +64,7 @@ require: []
 jobs: {}
 ```
 In the root of project there is 3 fields:
+
 - `name` - Used to identify project.
 - `with` - Additional options to run your project.
 - `require` - List of programs that required to run this project.
@@ -66,7 +72,9 @@ In the root of project there is 3 fields:
 We will skip `name` field because it's obvious what it is purpose.
 
 ### `with` option
+
 The `with` field serves as additional options for your project. It has 2 options:
+
 ```yaml
 ...
 with:
@@ -82,7 +90,9 @@ with:
 - `cwd` - Changes the working directory for Tesuto.
 
 ### Required Programs
+
 In the `require` field you can specify which programs are required to run this project:
+
 ```yaml
 ...
 require:
@@ -90,9 +100,13 @@ require:
   - cargo
 ...
 ```
+
 It's a list of program that will be found through search in PATH. If one of this programs are not found, Tesuto will crash and tell you which program is not found.
+
 ### Jobs and Steps
+
 Jobs contain steps that Tesuto needs to perform to complete a job. Every job in a project will be executed step-by-step. The syntax of a job looks like this:
+
 ```yaml
 ...
 jobs:
@@ -102,7 +116,9 @@ jobs:
     quiete: false
 ...
 ```
+
 Step has 3 properties:
+
 - `name` - The name of the step. If it's empty, it will be replaced with the command that the step should run.
 - `run` - The command to run. If this field is empty, Tesuto will display only the name of the step. If both name and run fields are empty, Tesuto will skip the step.
 - `quiet` - Whether to display the output or not.
