@@ -1,20 +1,22 @@
 use dialoguer::{theme::ColorfulTheme, Confirm, Input};
-use std::process::exit;
+use std::process;
 
-const RESET: &str = "\x1b[0m";
-const RED: &str = "\x1b[91m";
-const CYAN: &str = "\x1b[96m";
-const YELLOW: &str = "\x1b[93m";
-const GREEN: &str = "\x1b[92m";
-
+#[derive(Debug)]
 pub struct Term;
+
 impl Term {
-    fn print_with_icon(icon: &str, color: &str, msg: &str) {
-        println!("{color}{icon} {msg}{RESET}");
+    const RESET: &'static str = "\x1b[0m";
+    const RED: &'static str = "\x1b[91m";
+    const CYAN: &'static str = "\x1b[96m";
+    const YELLOW: &'static str = "\x1b[93m";
+    const GREEN: &'static str = "\x1b[92m";
+
+    fn print_colored(icon: &str, color: &str, msg: &str) {
+        println!("{color}{icon} {msg}{}", Self::RESET);
     }
 
     pub fn message(msg: &str) {
-        Self::print_with_icon("󰍡", "", msg);
+        println!("󰍡 {}", msg);
     }
 
     pub fn input(message: &str, default: &str) -> String {
@@ -23,49 +25,47 @@ impl Term {
             .default(default.to_string())
             .show_default(!default.is_empty())
             .interact_text()
-            .unwrap()
+            .unwrap_or_else(|_| default.to_string())
     }
 
     pub fn ask(question: &str, default: bool) -> bool {
         Confirm::with_theme(&ColorfulTheme::default())
             .with_prompt(question)
             .default(default)
-            .show_default(true)
             .interact()
-            .unwrap()
+            .unwrap_or(default)
     }
 
     pub fn no_icon_message(msg: &str) {
-        println!(" {msg}");
+        println!(" {}", msg);
     }
 
-    pub fn job_name(msg: &str){
-        Self::print_with_icon("", "", msg);
+    pub fn job_name(msg: &str) {
+        println!("  {}", msg);
     }
 
     pub fn error(msg: &str) {
-        Self::print_with_icon("", RED, msg);
+        Self::print_colored("", Self::RED, msg);
     }
 
-    pub fn fail(msg: &str) {
+    pub fn fail(msg: &str) -> ! {
         Self::error(msg);
-        exit(1);
+        process::exit(1);
     }
-    
 
     pub fn work(msg: &str) {
-        Self::print_with_icon("󰦖", CYAN, msg);
+        Self::print_colored("󰦖", Self::CYAN, msg);
     }
 
     pub fn work_with_margin(msg: &str) {
-        println!("   {msg}");
+        println!("   {}", msg);
     }
 
     pub fn warn(msg: &str) {
-        Self::print_with_icon("", YELLOW, msg);
+        Self::print_colored("", Self::YELLOW, msg);
     }
 
     pub fn done(msg: &str) {
-        Self::print_with_icon("", GREEN, msg);
+        Self::print_colored("", Self::GREEN, msg);
     }
 }

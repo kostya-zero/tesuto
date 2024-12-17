@@ -24,7 +24,6 @@ pub enum RunnerError {
     #[error("Unexpected error occured and program had exited.")]
     Unexpected,
 }
-
 pub struct Runner {
     project: Project,
 }
@@ -55,11 +54,15 @@ impl Runner {
 
     pub fn run_job(&self, job: (&String, &Vec<Step>)) -> Result<(), RunnerError> {
         Term::job_name(format!("Job '{}'", job.0).as_str());
+        let jobs_count = job.1.len();
 
-        job.1.iter().try_for_each(|step| self.run_step(step))
+        job.1.iter().enumerate().try_for_each(|(index, step)| {
+            let message_prefix = format!("[{}/{}]", index + 1, jobs_count);
+            self.run_step(step, message_prefix)
+        })
     }
 
-    pub fn run_step(&self, step: &Step) -> Result<(), RunnerError> {
+    pub fn run_step(&self, step: &Step, message_prefix: String) -> Result<(), RunnerError> {
         if step.is_name_empty() && step.is_run_empty() {
             return Ok(());
         }
@@ -69,7 +72,7 @@ impl Runner {
         } else {
             step.get_run()
         };
-        Term::work_with_margin(message.as_str());
+        Term::work_with_margin(format!("{} {}", message_prefix, message).as_str());
 
         let mut cmd = if env::consts::OS == "windows" {
             let mut command = Command::new("cmd");

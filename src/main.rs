@@ -119,7 +119,7 @@ fn main() {
                 Term::warn("This project has no jobs.");
                 exit(0);
             }
-            Term::message(format!("Jobs in project '{}':", project.get_name()).as_str());
+            Term::message(&format!("Jobs in project '{}':", project.get_name()));
             for job in project.get_jobs() {
                 Term::no_icon_message(job.0.as_str());
             }
