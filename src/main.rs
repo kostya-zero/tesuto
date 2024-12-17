@@ -34,29 +34,13 @@ fn main() {
     let project_path = args.get_one::<String>("project").unwrap();
 
     match args.subcommand() {
-        Some(("new", sub)) => {
+        Some(("generate", _sub)) => {
             if Path::new(project_path).exists() {
                 Term::warn("Project file already exists.");
                 exit(1);
             }
 
-            let project_name: String = sub
-                .get_one::<String>("name")
-                .filter(|name| !name.is_empty())
-                .cloned()
-                .unwrap_or_else(|| Term::input("The name of your project?", "TesutoProject"));
-
-            let use_example = if sub.get_flag("example") {
-                true
-            } else {
-                Term::ask("Use example project?", false)
-            };
-
-            let new_project: Project = if use_example {
-                Project::example(project_name.as_str())
-            } else {
-                Project::new(project_name.as_str())
-            };
+            let new_project: Project = Project::example("TesutoProject");
             match serde_yaml::to_string(&new_project) {
                 Ok(project_string) => match fs::write(project_path, project_string) {
                     Ok(_) => Term::done("Project created. It's saved as `tesuto.yml`."),

@@ -41,7 +41,7 @@ impl Term {
     }
 
     pub fn job_name(msg: &str) {
-        println!("  {}", msg);
+        println!(" {}", msg);
     }
 
     pub fn error(msg: &str) {
