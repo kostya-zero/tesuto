@@ -37,10 +37,10 @@ tesuto run
 tesuto run --project "configs/tesuto.yml"
 ```
 
-Also, you can run specific job with `run-job` command:
+Also, you can run specific job with `--job` flag:
 
 ```shell
-tesuto run-job cargo
+tesuto run --job cargo
 ```
 
 ## Configuration
