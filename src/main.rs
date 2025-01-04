@@ -60,7 +60,6 @@ fn main() {
                 project
             } else {
                 Term::fail("Looks like your project is broken. Cannot run it.");
-                exit(1);
             };
 
             if project.is_jobs_empty() {

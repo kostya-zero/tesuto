@@ -1,4 +1,4 @@
-use clap::{value_parser, Arg, ArgAction, Command};
+use clap::{value_parser, Arg, Command};
 
 pub fn args() -> Command {
     Command::new("tesuto")
