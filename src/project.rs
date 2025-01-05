@@ -76,13 +76,6 @@ impl Default for Project {
 }
 
 impl Project {
-    pub fn new(name: &str) -> Self {
-        Self {
-            name: Some(String::from(name)),
-            ..Default::default()
-        }
-    }
-
     pub fn example(name: &str) -> Self {
         let mut jobs: IndexMap<String, Vec<Step>> = IndexMap::new();
         jobs.insert(
